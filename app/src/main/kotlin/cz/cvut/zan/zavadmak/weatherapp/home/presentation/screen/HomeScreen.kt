@@ -28,6 +28,7 @@ fun HomeScreen(
     locationRequestState: LocationRequestUiState,
     onSearchButtonClick: () -> Unit,
     onSettingsButtonClick: () -> Unit,
+    onLocationsRemove: (Set<Long>) -> Unit,
     onLocationClick: (Location) -> Unit,
     lastLocations: List<Location>,
 ) {
@@ -46,6 +47,7 @@ fun HomeScreen(
         )
         if (lastLocations.isNotEmpty()) {
             LastLocations(
+                onLocationsRemove = onLocationsRemove,
                 locations = lastLocations,
                 onLocationClick = onLocationClick
             )

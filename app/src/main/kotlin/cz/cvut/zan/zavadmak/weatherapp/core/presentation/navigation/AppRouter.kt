@@ -44,6 +44,7 @@ fun AppRouter(navController: NavHostController) {
                 lastLocations = lastLocations,
                 onSearchButtonClick = { navController.navigate(MainScreens.Search) },
                 onGetLocationClick = { viewModel.getDeviceLastLocation() },
+                onLocationsRemove = { viewModel.removeSelectedLocations(it) },
                 locationRequestState = locationRequest
             )
         }

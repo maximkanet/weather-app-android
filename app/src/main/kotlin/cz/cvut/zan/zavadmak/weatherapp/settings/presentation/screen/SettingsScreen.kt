@@ -41,6 +41,7 @@ fun SettingsScreen(
     onUnitChange: (WeatherUnit) -> Unit,
     onNotificationToggle: (NotificationType, Boolean) -> Unit,
     notificationsAllowed: Boolean,
+    onNotificationsEnable: (Boolean) -> Unit,
     notifications: List<NotificationUiState>
 ) {
     ScreenContainer(
@@ -65,7 +66,7 @@ fun SettingsScreen(
             item {
                 AllowNotifications(
                     notificationsAllowed = notificationsAllowed,
-                    onNotificationToggle = { onNotificationToggle(NotificationType.ALL, it) }
+                    onNotificationToggle = { onNotificationsEnable(it) }
                 )
             }
 

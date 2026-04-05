@@ -113,6 +113,7 @@ fun AppRouter(navController: NavHostController) {
                 },
                 notificationsAllowed = notificationsAllowed,
                 notifications = notifications,
+                onNotificationsEnable = { viewModel.toggleNotifications(it) }
             )
         }
 

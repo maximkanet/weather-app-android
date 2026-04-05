@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.NotificationState
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.NotificationType
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnit
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.AreNotificationsAllowedUseCase
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.DisableNotificationsUseCase
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.EnableNotificationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.GetNotificationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.GetWeatherUnitsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.SetNotificationStateUseCase
@@ -22,6 +25,9 @@ class SettingsViewModel(
     private val getWeatherUnitsUseCase: GetWeatherUnitsUseCase,
     private val getNotificationsUseCase: GetNotificationsUseCase,
     private val setNotificationStateUseCase: SetNotificationStateUseCase,
+    private val enableNotificationsUseCase: EnableNotificationsUseCase,
+    private val disableNotificationsUseCase: DisableNotificationsUseCase,
+    private val areNotificationsAllowedUseCase: AreNotificationsAllowedUseCase
 //    private val isNotificationsAllowUseCase: IsNotificationsAllowUseCase
 ) : ViewModel() {
 
@@ -61,25 +67,32 @@ class SettingsViewModel(
     }
 
     fun applyNotifications(notifications: List<NotificationState>) {
-        val areNotificationsAllowed = notifications.find {
-            it.type == NotificationType.ALL
-        }!!.checked
+        _notifications.update { notifications.map { it.toUiState() } }
+    }
 
-        _notificationsAllow.update { areNotificationsAllowed }
-
-        if (areNotificationsAllowed) {
-            _notifications.update {
-                notifications
-                    .filter { it.type != NotificationType.ALL }
-                    .map { it.toUiState() }
+    fun toggleNotifications(enable: Boolean) {
+        viewModelScope.launch {
+            setNotificationStateUseCase.execute(NotificationType.ALL, enable)
+            _notificationsAllow.update { enable }
+            if (enable) {
+                enableNotificationsUseCase.execute()
+                applyNotifications(getNotificationsUseCase.execute())
+            } else {
+                disableNotificationsUseCase.execute()
+                applyNotifications(listOf())
             }
-        } else
-            _notifications.update { listOf() }
+        }
     }
 
     fun fetchNotificationsState() {
         viewModelScope.launch {
-            applyNotifications(getNotificationsUseCase.execute())
+            val allowed = areNotificationsAllowedUseCase.execute()
+            _notificationsAllow.update { allowed }
+            if (allowed) {
+                applyNotifications(getNotificationsUseCase.execute())
+            } else {
+                applyNotifications(listOf())
+            }
         }
     }
 

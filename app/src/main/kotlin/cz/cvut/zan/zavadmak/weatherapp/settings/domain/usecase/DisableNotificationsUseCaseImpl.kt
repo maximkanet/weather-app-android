@@ -4,19 +4,19 @@ import cz.cvut.zan.zavadmak.weatherapp.core.domain.NotificationScheduler
 import cz.cvut.zan.zavadmak.weatherapp.settings.data.repository.SettingsRepository
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.NotificationType
 
-class SetNotificationStateUseCaseImpl(
+class DisableNotificationsUseCaseImpl(
     private val repository: SettingsRepository,
     private val notificationScheduler: NotificationScheduler
-) : SetNotificationStateUseCase {
-    override suspend fun execute(
-        type: NotificationType,
-        checked: Boolean
-    ) {
-        repository.setNotificationState(type, checked)
-        if (checked) {
-            notificationScheduler.scheduleNotification(type)
-        } else {
-            notificationScheduler.cancelNotification(type)
+) : DisableNotificationsUseCase {
+    override suspend fun execute() {
+        val items = listOf(
+            repository.getNotificationState(NotificationType.MORNING_FORECAST)
+        )
+
+        for (item in items) {
+            if(item.checked) {
+                notificationScheduler.cancelNotification(item.type)
+            }
         }
     }
 }

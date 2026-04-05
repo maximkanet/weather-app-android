@@ -9,7 +9,7 @@ class GetNotificationsUseCaseImpl(
 ) : GetNotificationsUseCase {
     override suspend fun execute(): List<NotificationState> {
         return listOf(
-            repository.getNotificationState(NotificationType.ALL),
+//            repository.getNotificationState(NotificationType.ALL),
             repository.getNotificationState(NotificationType.MORNING_FORECAST),
         )
     }

@@ -12,5 +12,4 @@ data class WeatherUiState(
     val windDirection: Double,
     val humidity: String,
     val precipitation: String,
-    val precipitationProbability: String,
 )

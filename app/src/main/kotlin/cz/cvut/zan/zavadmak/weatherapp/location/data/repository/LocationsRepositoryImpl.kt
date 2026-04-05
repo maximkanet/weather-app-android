@@ -1,10 +1,8 @@
 package cz.cvut.zan.zavadmak.weatherapp.location.data.repository
 
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSource
-import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApi
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSource
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.location.mapper.toDomainModel
 
 class LocationsRepositoryImpl(
     private val localDataSource: LocationLocalDataSource,

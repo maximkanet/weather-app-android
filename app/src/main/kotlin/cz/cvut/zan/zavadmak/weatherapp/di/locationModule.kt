@@ -2,7 +2,7 @@ package cz.cvut.zan.zavadmak.weatherapp.di
 
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSource
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSourceImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApi
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.GeoLocationApi
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApiImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSource
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSourceImpl
@@ -30,8 +30,10 @@ val locationModule = module {
 
     // ---------- Api ----------
 
-    single<NominatimApi> {
-        NominatimApiImpl()
+    single<GeoLocationApi> {
+        NominatimApiImpl(
+            client = get()
+        )
     }
 
     // ---------- Data source ----------

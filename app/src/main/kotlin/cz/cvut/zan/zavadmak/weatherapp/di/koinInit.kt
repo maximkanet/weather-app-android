@@ -10,7 +10,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             weatherModule,
             navigationModule,
             locationModule,
-            databaseModule
+            databaseModule,
+            networkModule
         )
     }
 }

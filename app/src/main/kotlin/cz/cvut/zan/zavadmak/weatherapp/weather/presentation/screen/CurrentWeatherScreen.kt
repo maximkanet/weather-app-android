@@ -42,7 +42,7 @@ fun CurrentWeatherScreen(
             windGusts = weather?.windGusts ?: "",
             windDirection = weather?.windDirection ?: 0.0,
             humidity = weather?.humidity ?: "",
-            precipitationProbability = weather?.precipitationProbability ?: "",
+            precipitation = weather?.precipitation ?: "",
             weatherDescription = weather?.weatherCode ?: "",
             weatherIcon = weather?.weatherIcon ?: R.drawable.clear,
         )
@@ -75,7 +75,7 @@ private fun WeatherDetails(
     windGusts: String,
     windDirection: Double,
     humidity: String,
-    precipitationProbability: String,
+    precipitation: String,
     weatherDescription: String,
     weatherIcon: Int,
 ) {
@@ -107,7 +107,10 @@ private fun WeatherDetails(
                 val infoFontSize = 16.sp
 
                 Text(text = stringResource(R.string.wind) + ": $wind", fontSize = infoFontSize)
-                Text(text = stringResource(R.string.wind_gusts) + ": $windGusts", fontSize = infoFontSize)
+                Text(
+                    text = stringResource(R.string.wind_gusts) + ": $windGusts",
+                    fontSize = infoFontSize
+                )
                 Row {
                     Text(
                         text = stringResource(R.string.wind_direction) + ": ",
@@ -121,9 +124,12 @@ private fun WeatherDetails(
                             .size(16.dp),
                     )
                 }
-                Text(text = stringResource(R.string.humidity) + ": $humidity", fontSize = infoFontSize)
                 Text(
-                    text = stringResource(R.string.precipitation_probability) + ": $precipitationProbability",
+                    text = stringResource(R.string.humidity) + ": $humidity",
+                    fontSize = infoFontSize
+                )
+                Text(
+                    text = stringResource(R.string.precipitation) + ": $precipitation",
                     fontSize = infoFontSize
                 )
             }

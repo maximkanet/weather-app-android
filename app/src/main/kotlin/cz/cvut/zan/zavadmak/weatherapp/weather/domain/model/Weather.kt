@@ -11,5 +11,4 @@ data class Weather (
     val windDirection: Double,
     val humidity: Double,
     val precipitation: Double,
-    val precipitationProbability: Double,
 )

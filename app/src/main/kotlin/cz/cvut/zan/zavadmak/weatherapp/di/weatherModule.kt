@@ -1,5 +1,13 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSource
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSourceImpl
+import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.api.MeteoApi
+import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.api.OpenMeteoApiImpl
+import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.source.WeatherRemoteDataSource
+import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.source.WeatherRemoteDataSourceImpl
+import cz.cvut.zan.zavadmak.weatherapp.weather.data.repository.WeatherRepository
+import cz.cvut.zan.zavadmak.weatherapp.weather.data.repository.WeatherRepositoryImpl
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetCurrentWeatherUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetCurrentWeatherUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetDailyWeatherUseCase
@@ -21,26 +29,54 @@ val weatherModule = module {
 //        LocationProvider(androidContext())
 //    }
 
+    /* ================== API ==================== */
+
+    single<MeteoApi> {
+        OpenMeteoApiImpl(
+            client = get()
+        )
+    }
+
+    /* ============== Data source ================ */
+
+    single<WeatherRemoteDataSource> {
+        WeatherRemoteDataSourceImpl(
+            api = get()
+        )
+    }
+
     /* ============== Repositories ============= */
 
-    // ...
+    single<WeatherRepository> {
+        WeatherRepositoryImpl(
+            remoteDataSource = get()
+        )
+    }
 
     /* ============== Use case ============= */
 
     single<GetCurrentWeatherUseCase> {
-        GetCurrentWeatherUseCaseImpl()
+        GetCurrentWeatherUseCaseImpl(
+            repository = get()
+        )
     }
 
     single<GetDailyWeatherUseCase> {
-        GetDailyWeatherUseCaseImpl()
+        GetDailyWeatherUseCaseImpl(
+            repository = get()
+        )
     }
 
     single<GetForecastUseCase> {
-        GetForecastUseCaseImpl()
+        GetForecastUseCaseImpl(
+            repository = get()
+        )
     }
 
     single<GetWeatherUnitsUseCase> {
-        GetWeatherUnitsUseCaseImpl()
+        GetWeatherUnitsUseCaseImpl(
+            repository = get()
+        )
     }
 
     /* ============== View models ============= */

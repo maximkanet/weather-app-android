@@ -68,7 +68,7 @@ class CurrentWeatherViewModel(
 
     fun fetchDailyWeather() {
         viewModelScope.launch {
-            applyDaily(getDailyWeatherUseCase.execute(lat = latitude, lon = longitude))
+            applyDaily(getDailyWeatherUseCase.execute(lat = latitude, lon = longitude).first())
         }
     }
 

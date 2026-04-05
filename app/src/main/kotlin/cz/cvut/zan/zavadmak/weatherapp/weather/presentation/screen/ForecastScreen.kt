@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
@@ -149,7 +148,6 @@ fun ForecastScreenPreview() {
                             windDirection = 48.49,
                             humidity = 50.51,
                             precipitation = 52.53,
-                            precipitationProbability = 54.55
                         ),
                         Weather(
                             time = LocalDateTime.parse("2025-04-25T17:00"),
@@ -160,7 +158,6 @@ fun ForecastScreenPreview() {
                             windDirection = 48.49,
                             humidity = 50.51,
                             precipitation = 52.53,
-                            precipitationProbability = 54.55
                         )
                     )
                 )

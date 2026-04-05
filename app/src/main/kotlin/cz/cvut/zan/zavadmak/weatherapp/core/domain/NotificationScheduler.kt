@@ -15,7 +15,7 @@ class NotificationScheduler(private val context: Context) {
         val now = Clock.System.now().toEpochMilliseconds()
 
         when (type) {
-            NotificationType.ALL -> {} // stub
+            NotificationType.ALL -> scheduleNotificationsActivation(now)
             NotificationType.MORNING_FORECAST -> scheduleMorningForecast(now)
         }
     }
@@ -27,9 +27,38 @@ class NotificationScheduler(private val context: Context) {
         }
     }
 
+    private fun scheduleNotificationsActivation(timeMillis: Long) {
+        val intent = Intent(context, NotificationPublisher::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("type", Notifications.AVAILABLE)
+            putExtra("route", MainScreens.Home.toString())
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            Notifications.AVAILABLE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            timeMillis,
+            pendingIntent
+        )
+
+        Log.i(
+            "NotificationScheduler",
+            "Notifications activation scheduled in $timeMillis"
+        )
+    }
+
     private fun scheduleMorningForecast(timeMillis: Long) {
         val intent = Intent(context, NotificationPublisher::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("type", Notifications.MORNING_FORECAST)
             putExtra("route", MainScreens.Home.toString())
         }
 

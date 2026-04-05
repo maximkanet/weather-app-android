@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 sealed interface MainScreens {
 
     @Serializable
-    data object Home: MainScreens
+    data object Home : MainScreens
 
     @Serializable
     data class Weather(val id: Long) : MainScreens
@@ -14,5 +14,5 @@ sealed interface MainScreens {
     data object Search: MainScreens
 
     @Serializable
-    data object Settings: MainScreens
+    data object Settings : MainScreens
 }

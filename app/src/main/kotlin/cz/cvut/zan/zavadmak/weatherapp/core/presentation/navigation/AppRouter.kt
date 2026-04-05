@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import cz.cvut.zan.zavadmak.weatherapp.home.domain.model.LocationRequestStatus
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.HomeScreen
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.viewmodel.HomeViewModel
+import cz.cvut.zan.zavadmak.weatherapp.search.domain.model.RequestState
 import cz.cvut.zan.zavadmak.weatherapp.search.presentation.screen.SearchScreen
 import cz.cvut.zan.zavadmak.weatherapp.search.presentation.viewmodel.SearchViewModel
 import cz.cvut.zan.zavadmak.weatherapp.settings.presentation.screen.SettingsScreen
@@ -49,9 +50,7 @@ fun AppRouter(navController: NavHostController) {
             HomeScreen(
                 onLocationClick = {
                     viewModel.markLocationAsUsed(id = it.id)
-                    navController.navigate(MainScreens.Weather(id = it.id)) {
-                        launchSingleTop = true
-                    }
+                    navController.navigate(MainScreens.Weather(id = it.id))
                 },
                 lastLocations = lastLocations,
                 onSearchButtonClick = { navController.navigate(MainScreens.Search) },
@@ -62,11 +61,37 @@ fun AppRouter(navController: NavHostController) {
                 mode = mode,
                 initiatorId = initiator,
                 onLocationChangeChecked = { id, checked ->
-                    viewModel.processSelection(
-                        id,
-                        checked
-                    )
+                    viewModel.processSelection(id, checked)
                 },
+            )
+        }
+
+        composable<MainScreens.Search> {
+            val viewModel = koinViewModel<SearchViewModel>()
+
+            val resultList by viewModel.result.collectAsStateWithLifecycle()
+            val savedLocation by viewModel.savedLocation.collectAsStateWithLifecycle()
+            val request by viewModel.requestState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(request) {
+                if (request == RequestState.SUCCESS) {
+                    savedLocation?.let {
+                        navController.navigate(MainScreens.Weather(id = it.id)) {
+                            popUpTo(MainScreens.Search) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                        viewModel.setRequestAsIdle()
+                    }
+                }
+            }
+
+            SearchScreen(
+                result = resultList,
+                onSearch = { viewModel.search(it) },
+                onLocationClick = { viewModel.saveLocation(location = it) },
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -88,28 +113,6 @@ fun AppRouter(navController: NavHostController) {
                 },
                 notificationsAllowed = notificationsAllowed,
                 notifications = notifications,
-            )
-        }
-
-        composable<MainScreens.Search> {
-            val viewModel = koinViewModel<SearchViewModel>()
-
-            val resultList by viewModel.result.collectAsStateWithLifecycle()
-            val savedLocation by viewModel.savedLocation.collectAsStateWithLifecycle()
-
-            LaunchedEffect(savedLocation) {
-                savedLocation?.let {
-                    navController.navigate(MainScreens.Weather(id = it.id)) {
-                        launchSingleTop = true
-                    }
-                }
-            }
-
-            SearchScreen(
-                result = resultList,
-                onSearch = { viewModel.search(it) },
-                onLocationClick = { viewModel.saveLocation(location = it) },
-                onBack = { navController.popBackStack() }
             )
         }
 

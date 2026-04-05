@@ -3,6 +3,7 @@ package cz.cvut.zan.zavadmak.weatherapp.search.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
+import cz.cvut.zan.zavadmak.weatherapp.search.domain.model.RequestState
 import cz.cvut.zan.zavadmak.weatherapp.search.domain.usecase.SaveLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.search.domain.usecase.SearchForLocationUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,9 +32,26 @@ class SearchViewModel(
     private val _savedLocation = MutableStateFlow<Location?>(null)
     val savedLocation = _savedLocation.asStateFlow()
 
+    private val _requestState = MutableStateFlow<RequestState>(RequestState.IDLE)
+    val requestState = _requestState.asStateFlow()
+
+    fun setRequestAsIdle() {
+        _requestState.update { RequestState.IDLE }
+    }
+
+    fun setRequestAsSuccess() {
+        _requestState.update { RequestState.SUCCESS }
+    }
+
+    fun setRequestAsGetting() {
+        _requestState.update { RequestState.GETTING }
+    }
+
     fun saveLocation(location: Location) {
         viewModelScope.launch {
+            setRequestAsGetting()
             _savedLocation.update { saveLocationUseCase.execute(location) }
+            setRequestAsSuccess()
         }
     }
 

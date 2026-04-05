@@ -106,6 +106,7 @@ class HomeViewModel(
         viewModelScope.launch {
             removeSelectedLocationsUseCase.execute(selectedItems.value.toList())
             _lastLocations.update { getLastLocationsUseCase.execute(LAST_LOCATIONS_COUNT) }
+            switchModeToIdle()
         }
     }
 

@@ -44,7 +44,13 @@ fun NavGraphBuilder.weatherNavGraph(
             }
 
             CurrentWeatherWrapperScreen(
-                onHomeClick = { navController.navigateUp() },
+                onHomeClick = {
+                    navController.navigate(MainScreens.Home) {
+                        popUpTo(MainScreens.Home) {
+                            inclusive = true
+                        }
+                    }
+                },
                 onSettingsClick = { navController.navigate(MainScreens.Settings) },
                 location = location,
                 currentWeather = currentWeather,

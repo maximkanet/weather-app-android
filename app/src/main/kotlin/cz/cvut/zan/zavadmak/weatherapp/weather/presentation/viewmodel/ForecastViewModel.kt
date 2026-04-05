@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetForecastUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils.formatDate
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +22,7 @@ class ForecastViewModel(
 
     private fun applyForecast(forecast: List<Weather>) {
         _forecast.update {
-            forecast.groupBy(keySelector = { i -> i.time.formatTime() })
+            forecast.groupBy(keySelector = { i -> i.time.formatDate() })
         }
     }
 

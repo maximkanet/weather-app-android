@@ -3,6 +3,7 @@ package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
+import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlin.time.Duration
@@ -22,6 +23,19 @@ fun LocalDateTime.formatTime() : String {
         hour()
         char(':')
         minute()
+    }
+    return this.format(timeFormatter)
+}
+
+fun LocalDateTime.formatDate() : String {
+    val timeFormatter = LocalDateTime.Format {
+        dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
+        char(' ')
+        char('(')
+        dayOfMonth()
+        char('.')
+        monthNumber()
+        char(')')
     }
     return this.format(timeFormatter)
 }

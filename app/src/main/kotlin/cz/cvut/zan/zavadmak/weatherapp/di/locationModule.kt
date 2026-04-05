@@ -70,7 +70,9 @@ val locationModule = module {
     }
 
     single<GetLocationsUseCase> {
-        GetLocationsUseCaseImpl()
+        GetLocationsUseCaseImpl(
+            repository = get()
+        )
     }
 
     single<SearchForLocationUseCase> {
@@ -80,11 +82,15 @@ val locationModule = module {
     }
 
     single<AddLocationUseCase> {
-        AddLocationUseCaseImpl()
+        AddLocationUseCaseImpl(
+            repository = get()
+        )
     }
 
     single<RemoveLocationUseCase> {
-        RemoveLocationUseCaseImpl()
+        RemoveLocationUseCaseImpl(
+            repository = get()
+        )
     }
 
     // ----------- View model -------------

@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.dao.LocationDao
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.entity.LocationEntity
 
-@Database(entities = [LocationEntity::class], version = 1)
+@Database(entities = [LocationEntity::class], version = 3)
 abstract class WeatherAppDatabase : RoomDatabase() {
 
     abstract fun locationDao(): LocationDao

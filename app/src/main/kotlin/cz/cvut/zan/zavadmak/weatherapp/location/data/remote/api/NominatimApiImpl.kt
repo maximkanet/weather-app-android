@@ -20,6 +20,7 @@ class NominatimApiImpl(
                     parameters.append("city", query)
                     parameters.append("addressdetails", "1")
                     parameters.append("format", "jsonv2")
+                    parameters.append("zoom", "15") // https://nominatim.org/release-docs/latest/api/Reverse/#result-restriction
                 }
             }
 
@@ -44,6 +45,7 @@ class NominatimApiImpl(
                     parameters.append("lon", longitude.toString())
                     parameters.append("addressdetails", "1")
                     parameters.append("format", "jsonv2")
+                    parameters.append("zoom", "15") // https://nominatim.org/release-docs/latest/api/Reverse/#result-restriction
                 }
             }
             if (res.status != HttpStatusCode.OK) {

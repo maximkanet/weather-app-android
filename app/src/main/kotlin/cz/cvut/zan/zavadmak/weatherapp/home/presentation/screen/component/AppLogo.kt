@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cz.cvut.zan.zavadmak.weatherapp.R
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.Typography
 
 @Composable
 fun AppLogo() {
@@ -30,7 +30,7 @@ fun AppLogo() {
         Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = stringResource(R.string.app_name),
-            fontSize = 32.sp
+            style = Typography.displaySmall,
         )
     }
 }

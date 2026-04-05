@@ -3,11 +3,11 @@ package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.settings.data.provider.SettingsProvider
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherRequest
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetCurrentWeatherUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetDailyWeatherUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetHourlyWeatherUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.mapper.toUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.DailyWeatherUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherUiState
@@ -19,18 +19,18 @@ import kotlinx.coroutines.launch
 class CurrentWeatherViewModel(
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
     private val getDailyWeatherUseCase: GetDailyWeatherUseCase,
+    private val getHourlyWeatherUseCase: GetHourlyWeatherUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val settingsProvider: SettingsProvider,
+    val locationId: Long,
 ) : ViewModel() {
 
     private val _location = MutableStateFlow<Location?>(null)
     val location = _location.asStateFlow()
 
-    fun fetchLocation(longitude: Double, latitude: Double) {
+    private fun fetchLocation(id: Long) {
         viewModelScope.launch {
-            _location.update {
-                getLocationUseCase.execute(longitude = longitude, latitude = latitude)
-            }
+            _location.update { getLocationUseCase.execute(id = id) }
         }
     }
 
@@ -65,11 +65,7 @@ class CurrentWeatherViewModel(
             _daily.update {
                 getDailyWeatherUseCase
                     .execute(longitude = longitude, latitude = latitude)
-                    .map {
-                        it.toUiState(
-                            temperatureUnit = temperatureUnit
-                        )
-                    }
+                    .map { it.toUiState(temperatureUnit = temperatureUnit) }
             }
 
         }
@@ -80,21 +76,35 @@ class CurrentWeatherViewModel(
 
     fun fetchHourly(longitude: Double, latitude: Double) {
         viewModelScope.launch {
-//            val temperatureUnit = settingsProvider.getTemperatureUnit()
-//            val windUnit = settingsProvider.getWindUnit()
-//            val precipitationUnit = settingsProvider.getPrecipitationUnit()
-//
-//            _hourly.update {
-//
-//            }
+            val temperatureUnit = settingsProvider.getTemperatureUnit()
+            val windUnit = settingsProvider.getWindUnit()
+            val precipitationUnit = settingsProvider.getPrecipitationUnit()
+
+            _hourly.update {
+                getHourlyWeatherUseCase.execute(
+                    latitude = latitude,
+                    longitude = longitude,
+//                    period = DatePeriod(days = 2)
+                )
+                    .map {
+                        it.toUiState(
+                            temperatureUnit = temperatureUnit,
+                            windUnit = windUnit,
+                            precipitationUnit = precipitationUnit
+                        )
+                    }
+            }
         }
     }
 
-    private val _requestState = MutableStateFlow<WeatherRequest>(WeatherRequest.IDLE)
-    val requestState = _requestState.asStateFlow()
+    fun fetchAll(latitude: Double, longitude: Double) {
+        fetchCurrent(latitude = latitude, longitude = longitude)
+        fetchDaily(latitude = latitude, longitude = longitude)
+        fetchHourly(latitude = latitude, longitude = longitude)
+    }
 
-    fun setRequestState(state: WeatherRequest) {
-        _requestState.update { state }
+    init {
+        fetchLocation(id = locationId)
     }
 
 }

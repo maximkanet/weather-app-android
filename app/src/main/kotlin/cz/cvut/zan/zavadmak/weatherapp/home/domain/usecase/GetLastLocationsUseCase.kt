@@ -4,6 +4,6 @@ import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 
 interface GetLastLocationsUseCase {
 
-    suspend fun execute(): List<Location>
+    suspend fun execute(count: Int): List<Location>
 
 }

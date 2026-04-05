@@ -13,6 +13,9 @@ interface LocationDao {
     @Query("SELECT * FROM location ORDER BY placeId ASC")
     suspend fun getLocations(): List<LocationEntity>
 
+    @Query("SELECT * FROM location ORDER BY lastUse DESC LIMIT :count")
+    suspend fun getLastLocations(count: Int): List<LocationEntity>
+
     @Query("SELECT * FROM location WHERE location.placeId = :id")
     suspend fun getLocationById(id: Long): LocationEntity?
 
@@ -20,7 +23,7 @@ interface LocationDao {
     suspend fun getLocationByCoord(longitude: Double, latitude: Double): LocationEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertLocation(locationEntity: LocationEntity)
+    suspend fun insertLocation(locationEntity: LocationEntity): Long
 
     @Delete
     suspend fun deleteLocation(location: LocationEntity)

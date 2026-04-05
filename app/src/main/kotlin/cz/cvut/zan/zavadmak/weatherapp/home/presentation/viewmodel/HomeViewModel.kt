@@ -2,10 +2,11 @@ package cz.cvut.zan.zavadmak.weatherapp.home.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetDeviceLastLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.LocationRequestUiState
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.MarkLocationsAsUsedUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val getLastLocationsUseCase: GetLastLocationsUseCase,
-    private val getLastLocationUseCase: GetLastLocationUseCase
+    private val getDeviceLastLocationUseCase: GetDeviceLastLocationUseCase,
+    private val markLocationsAsUsedUseCase: MarkLocationsAsUsedUseCase,
 ) : ViewModel() {
 
     private val _locationRequest = MutableStateFlow<LocationRequestUiState>(
@@ -36,36 +38,28 @@ class HomeViewModel(
         }
     }
 
-    fun setRequestAsError() {
-        _locationRequest.update {
-            LocationRequestUiState.Error()
-        }
-    }
-
-    fun getLastLocation() {
-        setRequestAsGetting()
+    fun getDeviceLastLocation() {
         viewModelScope.launch {
-            val location = getLastLocationUseCase.execute()
-
-            if (location == null) {
-                setRequestAsError()
-            } else {
-                _lastLocation.update { location }
-                setRequestAsSuccess()
-            }
+            setRequestAsGetting()
+            _lastLocation.update { getDeviceLastLocationUseCase.execute() }
+            setRequestAsSuccess()
         }
     }
 
     private val _lastLocations = MutableStateFlow<List<Location>>(listOf())
     val lastLocations = _lastLocations.asStateFlow()
 
-    fun applyLastLocations(items: List<Location>) {
-        _lastLocations.update { items }
-    }
-
     fun fetchLastLocations() {
         viewModelScope.launch {
-            applyLastLocations(getLastLocationsUseCase.execute())
+            _lastLocations.update {
+                getLastLocationsUseCase.execute(5)
+            }
+        }
+    }
+
+    fun markLocationAsUsed(id: Long) {
+        viewModelScope.launch {
+            markLocationsAsUsedUseCase.execute(id)
         }
     }
 

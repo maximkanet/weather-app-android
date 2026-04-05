@@ -1,9 +1,10 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.api
 
+import cz.cvut.zan.zavadmak.weatherapp.settings.data.provider.SettingsProvider
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnitType
 import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.model.CurrentWrapper
 import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.model.DailyDto
 import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.model.DailyWrapper
-import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.model.HourlyRaw
 import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.model.HourlyWrapper
 import cz.cvut.zan.zavadmak.weatherapp.weather.data.remote.model.WeatherDto
 import io.ktor.client.HttpClient
@@ -16,7 +17,8 @@ const val API_URL = "https://api.open-meteo.com/v1/forecast"
 
 // API: https://open-meteo.com/
 class OpenMeteoApiImpl(
-    private val client: HttpClient
+    private val client: HttpClient,
+    private val settingsProvider: SettingsProvider
 ) : MeteoApi {
 
     val weatherFields = listOf(
@@ -41,11 +43,19 @@ class OpenMeteoApiImpl(
         longitude: Double,
         latitude: Double
     ): WeatherDto {
+
+        val temperatureUnit = settingsProvider.getTemperatureUnit()
+        val windUnit = settingsProvider.getWindUnit()
+        val precipitationUnit = settingsProvider.getPrecipitationUnit()
+
         return client
             .get(API_URL) {
                 url {
                     parameters.append("latitude", latitude.toString())
                     parameters.append("longitude", longitude.toString())
+                    parameters.append("temperature_unit", temperatureUnit.name)
+                    parameters.append("wind_speed_unit", windUnit.name)
+                    parameters.append("precipitation_unit", precipitationUnit.name)
                     parameters.append(
                         "current",
                         weatherFields.joinToString(separator = ",")
@@ -61,11 +71,19 @@ class OpenMeteoApiImpl(
         longitude: Double,
         latitude: Double
     ): List<DailyDto> {
+
+        val temperatureUnit = settingsProvider.getTemperatureUnit()
+        val windUnit = settingsProvider.getWindUnit()
+        val precipitationUnit = settingsProvider.getPrecipitationUnit()
+
         val response = client
             .get(API_URL) {
                 url {
                     parameters.append("latitude", latitude.toString())
                     parameters.append("longitude", longitude.toString())
+                    parameters.append("temperature_unit", temperatureUnit.name)
+                    parameters.append("wind_speed_unit", windUnit.name)
+                    parameters.append("precipitation_unit", precipitationUnit.name)
                     parameters.append("daily", dailyFields.joinToString(separator = ","))
                     parameters.append("models", "best_match")
                 }
@@ -86,13 +104,22 @@ class OpenMeteoApiImpl(
 
     override suspend fun getHourlyWeather(
         longitude: Double,
-        latitude: Double
+        latitude: Double,
+        range: Int
     ): List<WeatherDto> {
+        val temperatureUnit = settingsProvider.getTemperatureUnit()
+        val windUnit = settingsProvider.getWindUnit()
+        val precipitationUnit = settingsProvider.getPrecipitationUnit()
+
         val response = client
             .get(API_URL) {
                 url {
                     parameters.append("latitude", latitude.toString())
                     parameters.append("longitude", longitude.toString())
+                    parameters.append("temperature_unit", temperatureUnit.name)
+                    parameters.append("wind_speed_unit", windUnit.name)
+                    parameters.append("precipitation_unit", precipitationUnit.name)
+                    parameters.append("forecast_days", range.toString())
                     parameters.append("models", "best_match")
                     parameters.append(
                         "hourly",

@@ -1,27 +1,31 @@
 package cz.cvut.zan.zavadmak.weatherapp.settings.presentation.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import cz.cvut.zan.zavadmak.weatherapp.R
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainer
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.TopBarContainer
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.Typography
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.NotificationType
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnit
 import cz.cvut.zan.zavadmak.weatherapp.settings.presentation.model.NotificationUiState
@@ -36,63 +40,96 @@ fun SettingsScreen(
     units: List<UnitUiState>,
     onUnitChange: (WeatherUnit) -> Unit,
     onNotificationToggle: (NotificationType, Boolean) -> Unit,
+    notificationsAllowed: Boolean,
     notifications: List<NotificationUiState>
 ) {
-    Scaffold(
-        topBar = { SettingsTopBar(onCloseClick) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 30.dp)
-                .padding(paddingValues)
-        ) {
-            Spacer(modifier = Modifier.height(10.dp))
-            SectionComponent(name = "Units") {
-                items(items = units, key = { it.current.type }) {
-                    SelectableOption(
-                        text = stringResource(it.optionName),
-                        description = if (it.optionDescription != null) stringResource(it.optionDescription) else null,
-                        current = it.current,
-                        items = it.all,
-                        onItemSelect = onUnitChange,
-                        toStringMapper = { it.description },
-                        comparator = { a, b -> a.name == b.name }
-                    )
-                }
+    ScreenContainer(
+        topBar = { SettingsTopBar(onCloseClick = onCloseClick) }
+    ) {
+        Spacer(modifier = Modifier.height(10.dp))
+        SectionComponent(name = "Units") {
+            items(items = units, key = { it.current.type }) {
+                SelectableOption(
+                    text = stringResource(it.optionName),
+                    description = if (it.optionDescription != null) stringResource(it.optionDescription) else null,
+                    current = it.current,
+                    items = it.all,
+                    onItemSelect = onUnitChange,
+                    toStringMapper = { it.description },
+                    comparator = { a, b -> a.name == b.name }
+                )
             }
-            HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
-            SectionComponent("Notifications") {
-                items(items = notifications) { n ->
-                    CheckableOption(
-                        text = stringResource(n.optionName),
-                        description = if (n.optionDescription != null) stringResource(n.optionDescription) else null,
-                        checked = n.checked,
-                        onCheckedChange = { onNotificationToggle(n.type, it) }
-                    )
-                }
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
+        SectionComponent("Notifications") {
+            item {
+                AllowNotifications(
+                    notificationsAllowed = notificationsAllowed,
+                    onNotificationToggle = { onNotificationToggle(NotificationType.ALL, it) }
+                )
+            }
+
+            items(items = notifications) { n ->
+                CheckableOption(
+                    text = stringResource(n.optionName),
+                    description = if (n.optionDescription != null) stringResource(n.optionDescription) else null,
+                    checked = n.checked,
+                    onCheckedChange = { onNotificationToggle(n.type, it) }
+                )
             }
         }
     }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun AllowNotifications(
+    onNotificationToggle: (Boolean) -> Unit,
+    notificationsAllowed: Boolean
+) {
+    val permissionState = rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS)
+
+    var waitForPermission by remember { mutableStateOf(false) }
+
+    LaunchedEffect(permissionState.status) {
+        if (permissionState.status.isGranted == false) {
+            onNotificationToggle(false)
+        } else {
+            if (waitForPermission) {
+                waitForPermission = false
+                onNotificationToggle(true) // toggle to enabled
+            }
+        }
+    }
+
+    CheckableOption(
+        text = stringResource(R.string.allow_all_notifications),
+        description = null,
+        checked = notificationsAllowed && permissionState.status.isGranted,
+        onCheckedChange = {
+            // When permissions are not granted
+            if (!notificationsAllowed && permissionState.status.isGranted == false) {
+                waitForPermission = true
+                permissionState.launchPermissionRequest()
+            } else {
+                onNotificationToggle(it)
+            }
+        }
+    )
 }
 
 @Composable
 fun SettingsTopBar(
     onCloseClick: () -> Unit
 ) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(horizontal = 13.dp, vertical = 10.dp)
-            .fillMaxWidth()
+    TopBarContainer(
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row {
-            Spacer(modifier = Modifier.width(15.dp))
-            Text(
-                text = stringResource(R.string.settings),
-                fontSize = 20.sp
-            )
-        }
+        Text(
+            text = stringResource(R.string.settings),
+            style = Typography.titleLarge,
+            modifier = Modifier.weight(1f)
+        )
         IconButton(
             onClick = onCloseClick
         ) {

@@ -8,11 +8,15 @@ interface LocationsRepository {
 
     suspend fun getLocations(): List<Location>
 
+    suspend fun getLastLocations(count: Int): List<Location>
+
+    suspend fun getLocationById(id: Long): Location?
+
     suspend fun searchLocation(query: String): List<Location>
 
     suspend fun reverseLocation(longitude: Double, latitude: Double): Location?
 
-    suspend fun addLocation(location: Location)
+    suspend fun saveLocation(location: Location): Location
 
     suspend fun removeLocation(locationId: Long)
 

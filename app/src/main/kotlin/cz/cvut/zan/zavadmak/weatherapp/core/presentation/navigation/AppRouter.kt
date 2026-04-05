@@ -4,14 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import cz.cvut.zan.zavadmak.weatherapp.home.domain.model.LocationRequestStatus
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.HomeScreen
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.viewmodel.HomeViewModel
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.SearchScreen
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.SearchViewModel
+import cz.cvut.zan.zavadmak.weatherapp.search.presentation.screen.SearchScreen
+import cz.cvut.zan.zavadmak.weatherapp.search.presentation.viewmodel.SearchViewModel
 import cz.cvut.zan.zavadmak.weatherapp.settings.presentation.screen.SettingsScreen
 import cz.cvut.zan.zavadmak.weatherapp.settings.presentation.viewmodel.SettingsViewModel
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.navigation.WeatherScreens
@@ -19,51 +18,32 @@ import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.navigation.weatherNa
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AppRouter() {
-    val navController = rememberNavController()
+fun AppRouter(navController: NavHostController) {
 
     NavHost(
         navController = navController,
         startDestination = MainScreens.Home
     ) {
         composable<MainScreens.Home> {
-
             val viewModel = koinViewModel<HomeViewModel>()
 
             val locationRequest by viewModel.locationRequest.collectAsStateWithLifecycle()
             val lastLocations by viewModel.lastLocations.collectAsStateWithLifecycle()
             val lastLocation by viewModel.lastLocation.collectAsStateWithLifecycle()
 
-            LaunchedEffect(locationRequest) {
-                if (locationRequest.status == LocationRequestStatus.SUCCESS) {
-                    navController.navigate(
-                        WeatherScreens.CurrentWeather(
-                            longitude = lastLocation!!.longitude,
-                            latitude = lastLocation!!.latitude
-                        )
-                    )
-                }
+            LaunchedEffect(lastLocation) {
+                lastLocation?.let { navController.navigate(WeatherScreens.CurrentWeather(id = it.id)) }
             }
 
             HomeScreen(
-                onSettingsButtonClick = {
-                    navController.navigate(MainScreens.Settings)
-                },
+                onSettingsButtonClick = { navController.navigate(MainScreens.Settings) },
                 onLocationClick = {
-                    navController.navigate(
-                        WeatherScreens.CurrentWeather(
-                            latitude = it.latitude,
-                            longitude = it.longitude
-                        )
-                    )
+                    viewModel.markLocationAsUsed(id = it.id)
+                    navController.navigate(WeatherScreens.CurrentWeather(id = it.id))
                 },
                 lastLocations = lastLocations,
-                onSearchButtonClick = {
-                    navController.navigate(MainScreens.Search)
-                },
-                onGetLocationClick = {
-                    viewModel.getLastLocation()
-                },
+                onSearchButtonClick = { navController.navigate(MainScreens.Search) },
+                onGetLocationClick = { viewModel.getDeviceLastLocation() },
                 locationRequestState = locationRequest
             )
         }
@@ -72,6 +52,7 @@ fun AppRouter() {
             val viewModel = koinViewModel<SettingsViewModel>()
 
             val units by viewModel.units.collectAsStateWithLifecycle()
+            val notificationsAllowed by viewModel.notificationsAllowed.collectAsStateWithLifecycle()
             val notifications by viewModel.notifications.collectAsStateWithLifecycle()
 
             SettingsScreen(
@@ -79,51 +60,39 @@ fun AppRouter() {
                     navController.popBackStack()
                 },
                 units = units,
-                onUnitChange = { unit ->
-                    viewModel.changeUnit(unit)
-                },
+                onUnitChange = { unit -> viewModel.changeUnit(unit) },
                 onNotificationToggle = { type, checked ->
                     viewModel.changeNotificationState(type, checked)
                 },
+                notificationsAllowed = notificationsAllowed,
                 notifications = notifications,
             )
         }
 
         composable<MainScreens.Search> {
-
             val viewModel = koinViewModel<SearchViewModel>()
 
             val resultList by viewModel.result.collectAsStateWithLifecycle()
+            val savedLocation by viewModel.savedLocation.collectAsStateWithLifecycle()
+
+            LaunchedEffect(savedLocation) {
+                savedLocation?.let { navController.navigate(WeatherScreens.CurrentWeather(id = it.id)) }
+            }
 
             SearchScreen(
                 result = resultList,
-                onSearch = { query ->
-                    viewModel.search(query)
-                },
-                onLocationClick = {
-                    navController.navigate(
-                        WeatherScreens.CurrentWeather(
-                            longitude = it.longitude,
-                            latitude = it.latitude
-                        )
-                    ) {
-                        popUpTo(navController.currentDestination?.route ?: "") {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                },
-                onBack = {
-                    navController.popBackStack()
-                }
+                onSearch = { viewModel.search(it) },
+                onLocationClick = { viewModel.saveLocation(location = it) },
+                onBack = { navController.popBackStack() }
             )
         }
 
         weatherNavGraph(
             navController = navController,
             startDestination = WeatherScreens.CurrentWeather(
-                latitude = 50.073658,
-                longitude = 14.418540
+//                latitude = 50.073658,
+//                longitude = 14.418540,
+                id = 0
             )
         )
     }

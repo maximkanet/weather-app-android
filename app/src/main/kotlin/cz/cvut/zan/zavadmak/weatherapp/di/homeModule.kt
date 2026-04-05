@@ -1,10 +1,12 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
-import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationUseCase
-import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationUseCaseImpl
+import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetDeviceLastLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetDeviceLastLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationsUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.viewmodel.HomeViewModel
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.MarkLocationsAsUsedUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.MarkLocationsAsUsedUseCaseImpl
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -12,14 +14,22 @@ val homeModule = module {
 
     // ------------ Use case ------------
 
-    single<GetLastLocationUseCase> {
-        GetLastLocationUseCaseImpl(
+    single<GetDeviceLastLocationUseCase> {
+        GetDeviceLastLocationUseCaseImpl(
             repository = get()
         )
     }
 
     single<GetLastLocationsUseCase> {
-        GetLastLocationsUseCaseImpl()
+        GetLastLocationsUseCaseImpl(
+            repository = get()
+        )
+    }
+
+    single<MarkLocationsAsUsedUseCase> {
+        MarkLocationsAsUsedUseCaseImpl(
+            repository = get()
+        )
     }
 
     // ------------- View model -------------
@@ -27,7 +37,8 @@ val homeModule = module {
     viewModel {
         HomeViewModel(
             getLastLocationsUseCase = get(),
-            getLastLocationUseCase = get()
+            getDeviceLastLocationUseCase = get(),
+            markLocationsAsUsedUseCase = get()
         )
     }
 

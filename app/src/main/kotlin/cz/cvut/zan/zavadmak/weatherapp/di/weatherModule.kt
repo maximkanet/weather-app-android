@@ -1,9 +1,5 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.settings.data.provider.SettingsProvider
 import cz.cvut.zan.zavadmak.weatherapp.settings.data.provider.SettingsProviderImpl
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.usecase.GetWeatherUnitsUseCase
@@ -20,6 +16,10 @@ import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetDailyWeatherUse
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetDailyWeatherUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetForecastUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetForecastUseCaseImpl
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetHourlyWeatherUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetHourlyWeatherUseCaseImpl
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.CurrentWeatherViewModel
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.ForecastViewModel
 import org.koin.core.module.dsl.viewModel
@@ -31,7 +31,8 @@ val weatherModule = module {
 
     single<MeteoApi> {
         OpenMeteoApiImpl(
-            client = get()
+            client = get(),
+            settingsProvider = get()
         )
     }
 
@@ -91,21 +92,28 @@ val weatherModule = module {
         )
     }
 
+    single<GetHourlyWeatherUseCase> {
+        GetHourlyWeatherUseCaseImpl(
+            repository = get()
+        )
+    }
+
     /* ============== View models ============= */
 
-    viewModel {
+    viewModel { params ->
         CurrentWeatherViewModel(
             getCurrentWeatherUseCase = get(),
             getDailyWeatherUseCase = get(),
             getLocationUseCase = get(),
+            getHourlyWeatherUseCase = get(),
             settingsProvider = get(),
+            locationId = params.get()
         )
     }
 
     viewModel {
         ForecastViewModel(
             getForecastUseCase = get(),
-            changeForecastRangeUseCase = get(),
             settingsProvider = get(),
             getLocationUseCase = get(),
         )

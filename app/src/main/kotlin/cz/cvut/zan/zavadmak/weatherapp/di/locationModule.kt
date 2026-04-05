@@ -10,17 +10,11 @@ import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemot
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSourceImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepository
 import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepositoryImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.RemoveLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.RemoveLocationUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.SearchViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val locationModule = module {
@@ -71,29 +65,9 @@ val locationModule = module {
         )
     }
 
-    single<SearchForLocationUseCase> {
-        SearchForLocationUseCaseImpl(
-            repository = get()
-        )
-    }
-
-    single<AddLocationUseCase> {
-        AddLocationUseCaseImpl(
-            repository = get()
-        )
-    }
-
     single<RemoveLocationUseCase> {
         RemoveLocationUseCaseImpl(
             repository = get()
-        )
-    }
-
-    // ----------- View model -------------
-
-    viewModel {
-        SearchViewModel(
-            searchForLocationUseCase = get()
         )
     }
 

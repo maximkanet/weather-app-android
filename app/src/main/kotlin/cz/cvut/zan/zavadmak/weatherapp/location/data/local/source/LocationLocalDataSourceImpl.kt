@@ -22,8 +22,19 @@ class LocationLocalDataSourceImpl(
         }
     }
 
-    override suspend fun addLocation(location: Location) {
-        locationDao.insertLocation(location.toDataModel())
+    override suspend fun getLocation(id: Long): Location? {
+        return locationDao.getLocationById(id)?.toDomainModel()
+    }
+
+    override suspend fun getLastLocations(count: Int): List<Location> {
+        return locationDao.getLastLocations(count).map {
+            it.toDomainModel()
+        }
+    }
+
+    override suspend fun addLocation(location: Location): Location {
+        val inserted = locationDao.insertLocation(location.toDataModel())
+        return locationDao.getLocationById(inserted)!!.toDomainModel()
     }
 
     override suspend fun removeLocation(locationId: Long) {

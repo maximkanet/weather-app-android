@@ -1,26 +1,32 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_7_PRO
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cz.cvut.zan.zavadmak.weatherapp.R
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainer
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.Typography
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.WeatherAppTheme
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.settings.presentation.screen.component.ItemPicker
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnit
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.DayHourlyUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherUiState
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.components.ForecastTopBar
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.components.HourlyItem
 
 @Composable
 fun ForecastScreen(
@@ -30,26 +36,38 @@ fun ForecastScreen(
     location: Location?,
     forecast: List<DayHourlyUiState>,
 ) {
-    Scaffold(
+    ScreenContainer(
         topBar = {
             ForecastTopBar(
-                forecastRange = forecastRange,
                 onBackClick = onBackBack,
+                forecastRange = forecastRange,
                 onDaysChange = onDaysChange,
-                location = location
+                location = location,
             )
-        }
-    ) { paddingValues ->
+        },
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
         LazyColumn(
-            modifier = Modifier.padding(paddingValues)
+            contentPadding = PaddingValues(vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(forecast) { (day, hourly) ->
-                Text(
-                    text = day
-                )
-                Card {
-                    LazyColumn {
-                        items(hourly) {
+                Column {
+                    Text(
+                        text = day,
+                        style = Typography.titleSmall
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier
+                            .background(
+                                shape = RoundedCornerShape(10.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainer
+                            )
+                            .padding(15.dp)
+                    ) {
+                        hourly.forEach {
                             HourlyItem(it)
                         }
                     }
@@ -59,71 +77,135 @@ fun ForecastScreen(
     }
 }
 
-@Composable
-private fun HourlyItem(item: WeatherUiState) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = item.time,
-            modifier = Modifier.weight(1f)
-        )
-        Icon(
-            painter = painterResource(item.icon),
-            contentDescription = item.codeString
-        )
-        Text(
-            text = item.temperature,
-            modifier = Modifier.weight(1f)
-        )
-        Row(
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.wind_direction_icon),
-                contentDescription = null,
-                modifier = Modifier.rotate(item.windDirection.toFloat())
-            )
-            Text(
-                text = item.time,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Composable
-fun ForecastTopBar(
-    onBackClick: () -> Unit,
-    forecastRange: Int,
-    onDaysChange: (Int) -> Unit,
-    location: Location?
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            IconButton(
-                onClick = onBackClick
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_arrow_back_24),
-                    contentDescription = "Back"
-                )
-            }
-            Text(
-                text = location?.name ?: ""
-            )
-        }
-        ItemPicker(
-            current = forecastRange,
-            items = listOf(5, 7, 10, 14),
-            comparator = { i1, i2 -> i1 == i2 },
-            toStringMapper = { i -> "$i days" },
-            onItemSelect = onDaysChange
-        )
-    }
-}
+//@Preview(device = PIXEL_7_PRO)
+//@Composable
+//fun ForecastScreenPreview() {
+//    WeatherAppTheme(darkTheme = true) {
+//        ForecastScreen(
+//            forecastRange = 7,
+//            onDaysChange = {},
+//            onBackBack = {},
+//            location = Location(
+//                id = 0,
+//                longitude = 12.0,
+//                latitude = 14.0,
+//                name = "Nova vodolaha ldlfd lfd ksdm fsdfsd dsfdsffsd dsfdsf",
+//                state = "Kharkiv",
+//                country = "Ukraine"
+//            ),
+//            forecast = listOf(
+//                DayHourlyUiState(
+//                    day = "Ut (23.02)",
+//                    hourly = listOf(
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        )
+//                    )
+//                ),
+//                DayHourlyUiState(
+//                    day = "Ut (23.02)",
+//                    hourly = listOf(
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        ),
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        ),
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        )
+//                    )
+//                ),
+//                DayHourlyUiState(
+//                    day = "Ut (23.02)",
+//                    hourly = listOf(
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        ),
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        ),
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        ),
+//                        WeatherUiState(
+//                            day = "",
+//                            time = "00:00",
+//                            codeString = "CLear",
+//                            icon = R.drawable.app_icon,
+//                            temperature = WeatherUnit.Celsius().valueToString(10.0),
+//                            wind = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windGusts = WeatherUnit.MetersPerSecond().valueToString(10.0),
+//                            windDirection = 30.0,
+//                            humidity = "12 %",
+//                            precipitation = WeatherUnit.Millimeters().valueToString(10.0)
+//                        )
+//                    )
+//                )
+//            )
+//        )
+//    }
+//}

@@ -22,6 +22,7 @@ class SettingsViewModel(
     private val getWeatherUnitsUseCase: GetWeatherUnitsUseCase,
     private val getNotificationsUseCase: GetNotificationsUseCase,
     private val setNotificationStateUseCase: SetNotificationStateUseCase,
+//    private val isNotificationsAllowUseCase: IsNotificationsAllowUseCase
 ) : ViewModel() {
 
     private val _units = MutableStateFlow<List<UnitUiState>>(listOf())
@@ -46,6 +47,9 @@ class SettingsViewModel(
         }
     }
 
+    private val _notificationsAllow = MutableStateFlow<Boolean>(false)
+    val notificationsAllowed = _notificationsAllow.asStateFlow()
+
     private val _notifications = MutableStateFlow<List<NotificationUiState>>(listOf())
     val notifications = _notifications.asStateFlow()
 
@@ -57,9 +61,20 @@ class SettingsViewModel(
     }
 
     fun applyNotifications(notifications: List<NotificationState>) {
-        _notifications.update {
-            notifications.map { it.toUiState() }
-        }
+        val areNotificationsAllowed = notifications.find {
+            it.type == NotificationType.ALL
+        }!!.checked
+
+        _notificationsAllow.update { areNotificationsAllowed }
+
+        if (areNotificationsAllowed) {
+            _notifications.update {
+                notifications
+                    .filter { it.type != NotificationType.ALL }
+                    .map { it.toUiState() }
+            }
+        } else
+            _notifications.update { listOf() }
     }
 
     fun fetchNotificationsState() {

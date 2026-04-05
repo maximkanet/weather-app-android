@@ -6,5 +6,5 @@ import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
 interface WeatherRemoteDataSource {
     suspend fun getCurrentWeather(longitude: Double, latitude: Double): Weather
     suspend fun getDailyWeather(longitude: Double, latitude: Double): List<DailyWeather>
-    suspend fun getForecast(longitude: Double, latitude: Double): List<Weather>
+    suspend fun getForecast(longitude: Double, latitude: Double, range: Int): List<Weather>
 }

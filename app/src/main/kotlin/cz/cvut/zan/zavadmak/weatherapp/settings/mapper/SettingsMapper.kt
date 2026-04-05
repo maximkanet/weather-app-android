@@ -39,14 +39,14 @@ fun NotificationState.toUiState(): NotificationUiState {
             optionName = R.string.allow_all_notifications,
             optionDescription = null,
             type = type,
-            checked = checked
+            checked = checked,
         )
 
         NotificationType.MORNING_FORECAST -> NotificationUiState(
             optionName = R.string.enable_morning_forecast,
             optionDescription = R.string.enable_morning_forecast_description,
             type = type,
-            checked = checked
+            checked = checked,
         )
     }
 }

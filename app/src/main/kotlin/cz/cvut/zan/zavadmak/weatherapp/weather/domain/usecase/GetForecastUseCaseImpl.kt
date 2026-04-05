@@ -7,6 +7,8 @@ class GetForecastUseCaseImpl(
     private val repository: WeatherRepository
 ) : GetForecastUseCase {
     override suspend fun execute(longitude: Double, latitude: Double, range: Int): List<Weather> {
-        return repository.getForecast(longitude = longitude, latitude = latitude)
+        return repository
+            .getForecast(longitude = longitude, latitude = latitude, range = range)
+            .filter { it.time.time.hour % 2 == 0 }
     }
 }

@@ -2,6 +2,8 @@
     <string name="app_name">Weather App</string>
     <string name="last_locations_placeholder">The last locations will appear on this site</string>
 
+    <string name="last_locations">Last locations</string>
+
     <!-- Locations -->
     <string name="locations">Locations</string>
     <string name="get_my_location">Get my location</string>

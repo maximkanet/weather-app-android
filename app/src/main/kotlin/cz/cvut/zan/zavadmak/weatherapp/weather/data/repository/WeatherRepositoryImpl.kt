@@ -21,7 +21,15 @@ class WeatherRepositoryImpl(
         return remoteDataSource.getDailyWeather(longitude = longitude, latitude = latitude)
     }
 
-    override suspend fun getForecast(longitude: Double, latitude: Double): List<Weather> {
-        return remoteDataSource.getForecast(longitude = longitude, latitude = latitude)
+    override suspend fun getForecast(
+        longitude: Double,
+        latitude: Double,
+        range: Int
+    ): List<Weather> {
+        return remoteDataSource.getForecast(
+            longitude = longitude,
+            latitude = latitude,
+            range = range
+        )
     }
 }

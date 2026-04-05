@@ -9,5 +9,6 @@ data class NotificationUiState(
     @StringRes
     val optionDescription: Int?,
     val type: NotificationType,
-    val checked: Boolean
+    val checked: Boolean,
+//    val enabled: Boolean
 )

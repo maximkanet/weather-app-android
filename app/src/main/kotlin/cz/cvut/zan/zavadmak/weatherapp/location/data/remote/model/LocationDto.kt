@@ -1,5 +1,6 @@
 package cz.cvut.zan.zavadmak.weatherapp.location.data.remote.model
 
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.AddressType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -12,5 +13,6 @@ data class LocationDto(
     val name: String,
     @SerialName("display_name")
     val displayName: String,
+    val addresstype: AddressType = AddressType.ANY,
     val address: AddressDto,
 )

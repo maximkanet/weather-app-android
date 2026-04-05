@@ -8,4 +8,6 @@ interface SettingsProvider {
     suspend fun getWindUnit(): WeatherUnit
     suspend fun getPrecipitationUnit(): WeatherUnit
 
+    suspend fun isNotificationsAllow(): Boolean
+
 }

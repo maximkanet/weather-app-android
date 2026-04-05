@@ -64,6 +64,7 @@ val settingsModule = module {
             getWeatherUnitsUseCase = get(),
             getNotificationsUseCase = get(),
             setNotificationStateUseCase = get(),
+//            isNotificationsAllowUseCase = get(),
         )
     }
 }

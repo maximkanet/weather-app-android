@@ -1,23 +1,38 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_7_PRO
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import cz.cvut.zan.zavadmak.weatherapp.R
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainer
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.Typography
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.WeatherAppTheme
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnit
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherRequest
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.DailyWeatherUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherRequestUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherUiState
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.components.CurrentWeatherTopBar
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.components.DailyForecast
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.components.HourlyForecast
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.components.WeatherSummary
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun CurrentWeatherWrapperScreen(
-    request: WeatherRequestUiState,
     onHomeClick: () -> Unit,
     onSettingsClick: () -> Unit,
     location: Location?,
@@ -26,36 +41,28 @@ fun CurrentWeatherWrapperScreen(
     onDetailedForecastClick: (Location) -> Unit,
     hourly: List<WeatherUiState>?,
 ) {
-    Scaffold(
+    ScreenContainer(
         topBar = {
             CurrentWeatherTopBar(
                 onHomeClick = onHomeClick,
                 onSettingsClick = onSettingsClick
             )
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            var requestState = ""
-
-            if(request.request != WeatherRequest.IDLE) {
-                requestState = stringResource(request.stringRes)
-            }
-
-            Text(
-                text = requestState,
-                modifier = Modifier.fillMaxWidth()
+    ) {
+        if (currentWeather != null && location != null) {
+            WeatherSummary(
+                location = location,
+                currentWeather = currentWeather,
             )
-            if (currentWeather != null && location != null) {
-                WeatherSummary(
-                    location = location,
-                    currentWeather = currentWeather,
-                )
-            } else {
-                DummyWeatherSummary()
-            }
+        } else {
+            DummyWeatherSummary()
+        }
 
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
             if (daily != null && location != null)
                 DailyForecast(
                     daily = daily,
@@ -84,21 +91,22 @@ fun DummyWeatherSummary() {
             id = 0,
             longitude = 0.0,
             latitude = 0.0,
-            name = "---",
+            name = "Location ...",
             state = "---",
-            country = "---"
+            country = "---",
+            lastUse = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         ),
         currentWeather = WeatherUiState(
-            day = "perpetua",
-            time = "aperiri",
-            codeString = "evertitur",
-            icon = R.drawable.app_icon,
-            temperature = "suas",
-            wind = "veniam",
-            windGusts = "expetendis",
-            windDirection = 2.3,
-            humidity = "malesuada",
-            precipitation = "justo"
+            day = "---",
+            time = "---",
+            codeString = "---",
+            icon = R.drawable.app_icon, // add gray icon
+            temperature = "---",
+            wind = "---",
+            windGusts = "---",
+            windDirection = 0.0,
+            humidity = "---",
+            precipitation = "---"
         )
     )
 }

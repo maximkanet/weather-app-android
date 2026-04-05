@@ -25,9 +25,10 @@ class WeatherRemoteDataSourceImpl(
 
     override suspend fun getForecast(
         longitude: Double,
-        latitude: Double
+        latitude: Double,
+        range: Int
     ): List<Weather> {
-        return api.getHourlyWeather(longitude = longitude, latitude = latitude)
+        return api.getHourlyWeather(longitude = longitude, latitude = latitude, range = range)
             .map { it.toDomainModel() }
     }
 }

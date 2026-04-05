@@ -12,6 +12,6 @@ interface WeatherRepository {
 
     suspend fun getDailyWeather(longitude: Double, latitude: Double): List<DailyWeather>
 
-    suspend fun getForecast(longitude: Double, latitude: Double): List<Weather>
+    suspend fun getForecast(longitude: Double, latitude: Double, range: Int): List<Weather>
 
 }

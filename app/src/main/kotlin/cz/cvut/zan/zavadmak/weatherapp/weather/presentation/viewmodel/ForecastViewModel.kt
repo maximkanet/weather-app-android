@@ -3,15 +3,15 @@ package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.settings.data.provider.SettingsProvider
 import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnit
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.ChangeForecastRangeUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetForecastUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.mapper.toUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.DayHourlyUiState
-import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils.formatTime
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils.formatDate
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils.formatDateDay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 
 class ForecastViewModel(
     private val getForecastUseCase: GetForecastUseCase,
-    private val changeForecastRangeUseCase: ChangeForecastRangeUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val settingsProvider: SettingsProvider,
 ) : ViewModel() {
@@ -34,11 +33,16 @@ class ForecastViewModel(
         precipitationUnit: WeatherUnit
     ) {
         _forecast.update {
-            forecast
-                .groupBy(keySelector = { it.time })
-                .map { (time, weather) ->
+            forecast.groupBy { it.time.date }
+                .map { (_, weather) ->
+
+                    val weatherDateTime = weather.first().time
+
+                    val date = weatherDateTime.formatDate()
+                    val weekDay = weatherDateTime.formatDateDay()
+
                     DayHourlyUiState(
-                        day = time.formatTime(),
+                        day = "$date ($weekDay)",
                         hourly = weather.map {
                             it.toUiState(
                                 temperatureUnit = temperatureUnit,
@@ -79,19 +83,14 @@ class ForecastViewModel(
 
     fun changeRange(range: Int) {
         _forecastRange.update { range }
-        viewModelScope.launch {
-            changeForecastRangeUseCase.execute(range)
-        }
     }
 
     private val _location = MutableStateFlow<Location?>(null)
     val location = _location.asStateFlow()
 
-    fun fetchLocation(longitude: Double, latitude: Double) {
+    fun fetchLocation(id: Long) {
         viewModelScope.launch {
-            _location.update {
-                getLocationUseCase.execute(longitude = longitude, latitude = latitude)
-            }
+            _location.update { getLocationUseCase.execute(id = id) }
         }
     }
 }

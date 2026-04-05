@@ -56,7 +56,7 @@ fun LocationsScreen(
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = location.shortName,
+                            text = location.name,
                             fontSize = 20.sp
                         )
                         Text(

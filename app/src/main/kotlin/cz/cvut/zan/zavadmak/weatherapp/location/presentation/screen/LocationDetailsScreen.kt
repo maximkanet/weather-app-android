@@ -6,12 +6,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_7_PRO
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.ButtonWithIcon
-import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.PreviewScreenContainer
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainerWithTitle
 
 @Composable
@@ -20,7 +17,7 @@ fun LocationDetailsScreen(
     onLocationDelete: (Int) -> Unit
 ) {
     ScreenContainerWithTitle(
-        title = locationDetails.shortName,
+        title = locationDetails.name,
         actionButton = {
             ButtonWithIcon(
                 text = "Remove",

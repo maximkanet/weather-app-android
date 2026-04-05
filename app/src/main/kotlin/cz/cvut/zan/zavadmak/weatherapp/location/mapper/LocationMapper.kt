@@ -8,7 +8,7 @@ fun LocationDto.toDomainModel() : Location {
         id = this.placeId,
         longitude = this.lon,
         latitude = this.lat,
-        shortName = this.name,
+        name = this.name,
         fullName = this.displayName,
         state = this.address.state,
         country = this.address.country,

@@ -36,7 +36,7 @@ fun CurrentWeatherScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         WeatherDetails(
-            location = location?.shortName ?: stringResource(R.string.unknown_location),
+            location = location?.name ?: stringResource(R.string.unknown_location),
             currentTemperature = weather?.temperature ?: "",
             wind = weather?.wind ?: "",
             windGusts = weather?.windGusts ?: "",

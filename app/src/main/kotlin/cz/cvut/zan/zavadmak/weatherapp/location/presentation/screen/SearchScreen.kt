@@ -81,20 +81,23 @@ fun SearchScreen(
         }
 
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(15.dp)
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
             items(result) { location ->
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text(
-                            text = location.shortName,
+                            text = location.name,
                             fontSize = 16.sp
                         )
                         Text(
-                            text = location.fullName,
+                            text = "${location.state}, ${location.country}",
                             color = Color(0xFF4E4E4E),
                             fontSize = 14.sp
                         )
@@ -126,8 +129,10 @@ fun SearchScreenPreview() {
                     id = 1,
                     longitude = 12.0,
                     latitude = 14.0,
-                    shortName = "Nova Vodolaha",
-                    fullName = "Nova vodolaha"
+                    name = "Nova Vodolaha",
+                    fullName = "Nova vodolaha jnd jsdjn fjnsdj fnjsdn jfjsd njf jsdn fjsdj nfjnsd jfn jsdnj fnjsdn jfnjsd njf nsjd nfjnsd jnf jdsnfj sndj fn",
+                    state = "Kharkiv district",
+                    country = "Ukraine",
                 )
             ),
             query = "Hello world",

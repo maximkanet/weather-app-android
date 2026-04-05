@@ -16,6 +16,9 @@ interface LocationDao {
     @Query("SELECT * FROM location WHERE location.placeId = :id")
     suspend fun getLocationById(id: Long): LocationEntity?
 
+    @Query("SELECT * FROM location WHERE longitude = :longitude AND latitude = :latitude LIMIT 1")
+    suspend fun getLocationByCoord(longitude: Double, latitude: Double): LocationEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLocation(locationEntity: LocationEntity)
 

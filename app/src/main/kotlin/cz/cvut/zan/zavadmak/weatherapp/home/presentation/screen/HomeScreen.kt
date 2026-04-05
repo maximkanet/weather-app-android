@@ -19,7 +19,6 @@ import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.LocationRequestUi
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.ScreenMode
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.ActionButtons
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.AppLogo
-import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.HomeScreenTopBar
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.LastLocations
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 
@@ -28,19 +27,15 @@ fun HomeScreen(
     onGetLocationClick: () -> Unit,
     locationRequestState: LocationRequestUiState,
     onSearchButtonClick: () -> Unit,
-    onSettingsButtonClick: () -> Unit,
     onLocationsRemove: () -> Unit,
     onLocationLongClick: (Long) -> Unit,
     mode: ScreenMode,
     initiatorId: Long,
-    onLocationChangeCheked: (Long, Boolean) -> Unit,
+    onLocationChangeChecked: (Long, Boolean) -> Unit,
     onLocationClick: (Location) -> Unit,
     lastLocations: List<Location>,
 ) {
     ScreenContainer(
-        topBar = {
-            HomeScreenTopBar(onSettingsButtonClick = onSettingsButtonClick)
-        },
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(30.dp),
     ) {
@@ -55,7 +50,7 @@ fun HomeScreen(
                 onLocationsRemove = onLocationsRemove,
                 locations = lastLocations,
                 onLocationClick = onLocationClick,
-                onCheckedChange = onLocationChangeCheked,
+                onCheckedChange = onLocationChangeChecked,
                 initiatorId = initiatorId,
                 mode = mode,
                 onLocationLongClick = onLocationLongClick,

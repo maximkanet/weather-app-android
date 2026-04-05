@@ -6,8 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
-import cz.cvut.zan.zavadmak.weatherapp.R
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.navigation.AppRouter
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.WeatherAppTheme
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.navigation.WeatherScreens

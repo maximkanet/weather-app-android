@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.navigation.MainScreens
-import cz.cvut.zan.zavadmak.weatherapp.weather.mapper.toUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.CurrentWeatherWrapperScreen
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.ForecastScreen
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.CurrentWeatherViewModel
@@ -45,7 +44,7 @@ fun NavGraphBuilder.weatherNavGraph(
             }
 
             CurrentWeatherWrapperScreen(
-                onHomeClick = { navController.navigate(MainScreens.Home) },
+                onHomeClick = { navController.navigateUp() },
                 onSettingsClick = { navController.navigate(MainScreens.Settings) },
                 location = location,
                 currentWeather = currentWeather,

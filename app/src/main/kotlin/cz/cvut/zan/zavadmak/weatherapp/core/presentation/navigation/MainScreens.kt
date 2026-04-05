@@ -8,7 +8,7 @@ sealed interface MainScreens {
     data object Home: MainScreens
 
     @Serializable
-    data object Weather : MainScreens
+    data class Weather(val id: Long) : MainScreens
 
     @Serializable
     data object Search: MainScreens

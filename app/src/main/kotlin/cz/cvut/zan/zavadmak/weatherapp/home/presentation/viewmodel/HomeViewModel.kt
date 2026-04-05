@@ -31,6 +31,12 @@ class HomeViewModel(
     private val _lastLocation = MutableStateFlow<Location?>(null)
     val lastLocation = _lastLocation.asStateFlow()
 
+    fun setRequestAsIdle() {
+        _locationRequest.update {
+            LocationRequestUiState.Idle()
+        }
+    }
+
     fun setRequestAsGetting() {
         _locationRequest.update {
             LocationRequestUiState.Getting()

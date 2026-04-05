@@ -7,6 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import cz.cvut.zan.zavadmak.weatherapp.home.domain.model.LocationRequestStatus
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.HomeScreen
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.viewmodel.HomeViewModel
 import cz.cvut.zan.zavadmak.weatherapp.search.presentation.screen.SearchScreen
@@ -34,15 +35,23 @@ fun AppRouter(navController: NavHostController) {
             val initiator by viewModel.initiator.collectAsStateWithLifecycle()
             val mode by viewModel.mode.collectAsStateWithLifecycle()
 
-            LaunchedEffect(lastLocation) {
-                lastLocation?.let { navController.navigate(WeatherScreens.CurrentWeather(id = it.id)) }
+            LaunchedEffect(locationRequest) {
+                if (locationRequest.status == LocationRequestStatus.SUCCESS) {
+                    lastLocation?.let {
+                        navController.navigate(MainScreens.Weather(id = it.id)) {
+                            launchSingleTop = true
+                        }
+                        viewModel.setRequestAsIdle()
+                    }
+                }
             }
 
             HomeScreen(
-                onSettingsButtonClick = { navController.navigate(MainScreens.Settings) },
                 onLocationClick = {
                     viewModel.markLocationAsUsed(id = it.id)
-                    navController.navigate(WeatherScreens.CurrentWeather(id = it.id))
+                    navController.navigate(MainScreens.Weather(id = it.id)) {
+                        launchSingleTop = true
+                    }
                 },
                 lastLocations = lastLocations,
                 onSearchButtonClick = { navController.navigate(MainScreens.Search) },
@@ -52,7 +61,12 @@ fun AppRouter(navController: NavHostController) {
                 onLocationLongClick = { viewModel.switchModeToSelection(it) },
                 mode = mode,
                 initiatorId = initiator,
-                onLocationChangeCheked = { id, checked -> viewModel.processSelection(id, checked) },
+                onLocationChangeChecked = { id, checked ->
+                    viewModel.processSelection(
+                        id,
+                        checked
+                    )
+                },
             )
         }
 
@@ -84,7 +98,11 @@ fun AppRouter(navController: NavHostController) {
             val savedLocation by viewModel.savedLocation.collectAsStateWithLifecycle()
 
             LaunchedEffect(savedLocation) {
-                savedLocation?.let { navController.navigate(WeatherScreens.CurrentWeather(id = it.id)) }
+                savedLocation?.let {
+                    navController.navigate(MainScreens.Weather(id = it.id)) {
+                        launchSingleTop = true
+                    }
+                }
             }
 
             SearchScreen(
@@ -97,11 +115,7 @@ fun AppRouter(navController: NavHostController) {
 
         weatherNavGraph(
             navController = navController,
-            startDestination = WeatherScreens.CurrentWeather(
-//                latitude = 50.073658,
-//                longitude = 14.418540,
-                id = 0
-            )
+            startDestination = WeatherScreens.CurrentWeather(id = 0)
         )
     }
 }

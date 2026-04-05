@@ -14,7 +14,9 @@ val databaseModule = module {
             get(),
             WeatherAppDatabase::class.java,
             "weather_app_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration(false)
+            .build()
     }
 
     // --------- Dao ------------

@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+
+    <!-- Locations -->
+    <string name="locations">Locations</string>
+    <string name="unknown_location">Unknown location</string>
+
+    <!-- Weather -->
+    <string name="weather_code_icon">Weather code icon</string>
+    <string name="wind">Wind</string>
+    <string name="wind_gusts">Wind gusts</string>
+    <string name="humidity">Humidity</string>
+    <string name="precipitation_probability">Precipitation probability</string>
+    <string name="wind_direction">Wind direction</string>
+    <string name="wind_direction_icon">Wind direction icon</string>
+
+    <string name="see_detailed_forecast">See detailed forecast</string>
+
+    <!-- Daily -->
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+</resources>

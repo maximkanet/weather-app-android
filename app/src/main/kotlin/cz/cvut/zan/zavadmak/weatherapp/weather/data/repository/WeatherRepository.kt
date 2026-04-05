@@ -2,11 +2,11 @@ package cz.cvut.zan.zavadmak.weatherapp.weather.data.repository
 
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.DailyWeather
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherUnits
+import cz.cvut.zan.zavadmak.weatherapp.settings.domain.model.WeatherUnit
 
 interface WeatherRepository {
 
-    suspend fun getWeatherUnits(): WeatherUnits
+    suspend fun getWeatherUnits(): WeatherUnit
 
     suspend fun getCurrentWeather(longitude: Double, latitude: Double): Weather
 

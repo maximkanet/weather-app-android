@@ -1,40 +1,35 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.DailyWeather
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.settings.data.provider.SettingsProvider
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherRequest
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetCurrentWeatherUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetDailyWeatherUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.mapper.toUiState
-import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherUiState
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherUnits
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.GetWeatherUnitsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.DailyWeatherUiState
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class CurrentWeatherViewModel(
-    private val longitude: Double,
-    private val latitude: Double,
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
     private val getDailyWeatherUseCase: GetDailyWeatherUseCase,
-    private val getWeatherUnitsUseCase: GetWeatherUnitsUseCase,
+    private val getLocationUseCase: GetLocationUseCase,
+    private val settingsProvider: SettingsProvider,
 ) : ViewModel() {
 
-    private val _weatherUnits = MutableStateFlow<WeatherUnits>(WeatherUnits.asDefault())
-    val weatherUnits = _weatherUnits.asStateFlow()
+    private val _location = MutableStateFlow<Location?>(null)
+    val location = _location.asStateFlow()
 
-    private fun fetchWeatherUnits() {
+    fun fetchLocation(longitude: Double, latitude: Double) {
         viewModelScope.launch {
-            _weatherUnits.update {
-                getWeatherUnitsUseCase.execute()
+            _location.update {
+                getLocationUseCase.execute(longitude = longitude, latitude = latitude)
             }
         }
     }
@@ -42,41 +37,64 @@ class CurrentWeatherViewModel(
     private val _weather = MutableStateFlow<WeatherUiState?>(null)
     val weather = _weather.asStateFlow()
 
-    private fun applyWeather(weather: Weather) {
-        _weather.update {
-            weather.toUiState(weatherUnits.value)
-        }
-    }
-
-    fun fetchCurrentWeather() {
+    fun fetchCurrent(longitude: Double, latitude: Double) {
         viewModelScope.launch {
-            applyWeather(getCurrentWeatherUseCase.execute(lat = latitude, lon = longitude))
+            val temperatureUnit = settingsProvider.getTemperatureUnit()
+            val windUnit = settingsProvider.getWindUnit()
+            val precipitationUnit = settingsProvider.getPrecipitationUnit()
+
+            _weather.update {
+                getCurrentWeatherUseCase
+                    .execute(lon = longitude, lat = latitude)
+                    .toUiState(
+                        temperatureUnit = temperatureUnit,
+                        windUnit = windUnit,
+                        precipitationUnit = precipitationUnit
+                    )
+            }
         }
     }
 
-    private val _daily = MutableStateFlow<DailyWeatherUiState?>(null)
+    private val _daily = MutableStateFlow<List<DailyWeatherUiState>>(listOf())
     val daily = _daily.asStateFlow()
 
-    private fun applyDaily(dailyWeather: DailyWeather) {
-        _daily.update {
-            dailyWeather.toUiState(
-                units = weatherUnits.value,
-                now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            )
-        }
-    }
-
-    fun fetchDailyWeather() {
+    fun fetchDaily(longitude: Double, latitude: Double) {
         viewModelScope.launch {
-            applyDaily(getDailyWeatherUseCase.execute(lat = latitude, lon = longitude).first())
+            val temperatureUnit = settingsProvider.getTemperatureUnit()
+
+            _daily.update {
+                getDailyWeatherUseCase
+                    .execute(longitude = longitude, latitude = latitude)
+                    .map {
+                        it.toUiState(
+                            temperatureUnit = temperatureUnit
+                        )
+                    }
+            }
+
         }
     }
 
-    init {
-        Log.d("CurrentWeatherViewModel", "Fetching weather from $longitude, $latitude")
-        fetchWeatherUnits()
-        fetchCurrentWeather() // Depends on weather units
-        fetchDailyWeather() // Depends on weather units
+    private val _hourly = MutableStateFlow<List<WeatherUiState>>(listOf())
+    val hourly = _hourly.asStateFlow()
+
+    fun fetchHourly(longitude: Double, latitude: Double) {
+        viewModelScope.launch {
+//            val temperatureUnit = settingsProvider.getTemperatureUnit()
+//            val windUnit = settingsProvider.getWindUnit()
+//            val precipitationUnit = settingsProvider.getPrecipitationUnit()
+//
+//            _hourly.update {
+//
+//            }
+        }
+    }
+
+    private val _requestState = MutableStateFlow<WeatherRequest>(WeatherRequest.IDLE)
+    val requestState = _requestState.asStateFlow()
+
+    fun setRequestState(state: WeatherRequest) {
+        _requestState.update { state }
     }
 
 }

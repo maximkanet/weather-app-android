@@ -29,13 +29,16 @@ fun LocalDateTime.formatTime() : String {
 
 fun LocalDateTime.formatDate() : String {
     val timeFormatter = LocalDateTime.Format {
-        dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
-        char(' ')
-        char('(')
         dayOfMonth()
         char('.')
         monthNumber()
-        char(')')
+    }
+    return this.format(timeFormatter)
+}
+
+fun LocalDateTime.formatDateDay(): String {
+    val timeFormatter = LocalDateTime.Format {
+        dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
     }
     return this.format(timeFormatter)
 }

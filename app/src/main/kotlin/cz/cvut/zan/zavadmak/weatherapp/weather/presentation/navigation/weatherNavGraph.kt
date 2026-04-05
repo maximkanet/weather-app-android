@@ -1,6 +1,6 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.navigation
 
-import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -9,88 +9,91 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.navigation.MainScreens
-import cz.cvut.zan.zavadmak.weatherapp.core.presentation.navigation.sharedKoinViewModel
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.LocationsViewModel
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
-import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherUnits
-import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.CurrentWeatherScreen
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherRequest
+import cz.cvut.zan.zavadmak.weatherapp.weather.mapper.toUiState
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.CurrentWeatherWrapperScreen
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.ForecastScreen
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.CurrentWeatherViewModel
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.ForecastViewModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 fun NavGraphBuilder.weatherNavGraph(
-    navController: NavController
+    navController: NavController,
+    startDestination: Any
 ) {
-    // Get current location ...
-
-    val location = Pair(10.0, 5.0)
-
-    navigation<MainScreens.Weather>(
-        startDestination = WeatherScreens.CurrentWeather(
-            locationId = 1
-        )
-    ) {
+    navigation<MainScreens.Weather>(startDestination = startDestination) {
         composable<WeatherScreens.CurrentWeather> { backStack ->
 
-            val locationsViewModel = backStack.sharedKoinViewModel<LocationsViewModel>(
-                navController = navController
-            )
+            val route = backStack.toRoute<WeatherScreens.CurrentWeather>()
 
-            val locationId = backStack.toRoute<WeatherScreens.CurrentWeather>().locationId
+            val viewModel = koinViewModel<CurrentWeatherViewModel>()
 
-            val locations by locationsViewModel.locations.collectAsStateWithLifecycle()
-
-            val currentLocation = locations.find { it.id == locationId }
-
-            if(currentLocation == null) {
-                Log.e("weatherNavGraph", "Location with $locationId id was not found")
-            }
-
-            val viewModel = koinViewModel<CurrentWeatherViewModel> {
-                parametersOf(currentLocation?.longitude ?: 0.0, currentLocation?.latitude ?: 0.0)
-            }
-
-            val weather by viewModel.weather.collectAsStateWithLifecycle()
+            val location by viewModel.location.collectAsStateWithLifecycle()
+            val currentWeather by viewModel.weather.collectAsStateWithLifecycle()
             val daily by viewModel.daily.collectAsStateWithLifecycle()
+            val hourly by viewModel.hourly.collectAsStateWithLifecycle()
+            val requestState by viewModel.requestState.collectAsStateWithLifecycle()
 
-            CurrentWeatherScreen(
-                weather = weather,
-                location = currentLocation,
-                dailyWeather = daily,
+            LaunchedEffect(Unit) {
+                viewModel.setRequestState(WeatherRequest.UPDATING)
+                viewModel.fetchLocation(longitude = route.longitude, latitude = route.latitude)
+                viewModel.fetchCurrent(longitude = route.longitude, latitude = route.latitude)
+                viewModel.fetchDaily(longitude = route.longitude, latitude = route.latitude)
+                viewModel.fetchHourly(longitude = route.longitude, latitude = route.latitude)
+                viewModel.setRequestState(WeatherRequest.SUCCESS)
+                delay(1000)
+                viewModel.setRequestState(WeatherRequest.IDLE)
+            }
+
+            CurrentWeatherWrapperScreen(
+                onHomeClick = {
+                    navController.navigate(MainScreens.Home)
+                },
+                onSettingsClick = {
+                    navController.navigate(MainScreens.Settings)
+                },
+                location = location,
+                request = requestState.toUiState(),
+                currentWeather = currentWeather,
+                daily = daily,
                 onDetailedForecastClick = {
-                    navController.navigate(WeatherScreens.Forecast(it.id))
-                }
+                    navController.navigate(
+                        WeatherScreens.Forecast(
+                            longitude = it.longitude,
+                            latitude = it.latitude
+                        )
+                    )
+                },
+                hourly = hourly,
             )
-
         }
 
         composable<WeatherScreens.Forecast> { backStack ->
 
-            val locationsViewModel = backStack.sharedKoinViewModel<LocationsViewModel>(
-                navController = navController
-            )
+            val route = backStack.toRoute<WeatherScreens.Forecast>()
 
-            val locationId = backStack.toRoute<WeatherScreens.CurrentWeather>().locationId
-
-            val locations by locationsViewModel.locations.collectAsStateWithLifecycle()
-
-            val currentLocation = locations.find { it.id == locationId }
-
-            if(currentLocation == null) {
-                Log.e("weatherNavGraph", "Location with $locationId id was not found")
-            }
-
-            val viewModel = koinViewModel<ForecastViewModel> {
-                parametersOf(currentLocation?.longitude ?: 0.0, currentLocation?.latitude ?: 0.0)
-            }
+            val viewModel = koinViewModel<ForecastViewModel>()
 
             val forecast by viewModel.forecast.collectAsStateWithLifecycle()
+            val forecastRange by viewModel.forecastRange.collectAsStateWithLifecycle()
+            val location by viewModel.location.collectAsStateWithLifecycle()
+
+            LaunchedEffect(Unit) {
+                viewModel.fetchLocation(longitude = route.longitude, latitude = route.latitude)
+                viewModel.fetchForecast(
+                    longitude = route.longitude,
+                    latitude = route.latitude,
+                    range = forecastRange
+                )
+            }
 
             ForecastScreen(
-                weatherUnits = WeatherUnits.asDefault(),
-                forecast = forecast
+                forecastRange = forecastRange,
+                forecast = forecast,
+                onDaysChange = { viewModel.changeRange(it) },
+                onBackBack = { navController.popBackStack() },
+                location = location,
             )
         }
     }

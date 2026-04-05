@@ -4,6 +4,8 @@ import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 
 interface LocationLocalDataSource {
 
+    suspend fun getLocation(longitude: Double, latitude: Double): Location?
+
     suspend fun getLocations(): List<Location>
 
     suspend fun addLocation(location: Location)

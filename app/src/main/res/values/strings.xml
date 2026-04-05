@@ -1,10 +1,16 @@
 <resources>
-    <string name="app_name">WeatherApp</string>
+    <string name="app_name">Weather App</string>
+    <string name="last_locations_placeholder">The last locations will appear on this site</string>
 
     <!-- Locations -->
     <string name="locations">Locations</string>
+    <string name="get_my_location">Get my location</string>
+    <string name="getting_location">Getting location ...</string>
+    <string name="error_during_getting_location">Error</string>
+    <string name="location_received">Location received</string>
     <string name="unknown_location">Unknown location</string>
-    <string name="result_list_is_empty">Result list is empty</string>
+    <string name="result_list_is_empty">Location was not found</string>
+    <string name="query_is_empty">Type any location name for searching location</string>
 
     <!-- Weather -->
     <string name="weather_code_icon">Weather code icon</string>
@@ -21,4 +27,20 @@
     <!-- Daily -->
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="temperature_setting">Temperature</string>
+    <string name="wind_speed_setting">Wind speed</string>
+    <string name="precipitation_setting">Precipitation</string>
+
+    <!-- Notifications -->
+    <string name="allow_all_notifications">Allow notifications</string>
+    <string name="enable_morning_forecast">Enable morning forecast</string>
+    <string name="enable_morning_forecast_description">Send forecast notification at 7:00</string>
+    <string name="request_idle">Idle</string>
+    <string name="request_success">Updated!</string>
+    <string name="request_error">Error!\n</string>
+    <string name="request_updating">Updating ...</string>
+
 </resources>

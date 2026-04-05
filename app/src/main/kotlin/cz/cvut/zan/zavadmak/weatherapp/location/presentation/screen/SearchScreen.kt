@@ -1,10 +1,7 @@
 package cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,120 +9,177 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices.PIXEL_7_PRO
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cz.cvut.zan.zavadmak.weatherapp.R
-import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.PreviewScreenContainer
-import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainerWithTitle
+import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.LocationComponent
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.component.LocationComponentWithActionButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    result: List<Location>,
-    query: String,
-    onQueryChange: (String) -> Unit,
+    result: List<Location>?,
     onSearch: (String) -> Unit,
     onLocationClick: (Location) -> Unit,
+    onBack: () -> Unit
 ) {
 
-    ScreenContainerWithTitle(
-        title = "Search",
-        spacerHeight = 8.dp
-    ) {
-        Row(
+    var query by remember { mutableStateOf("") }
+
+    Scaffold { paddingValues ->
+        Column(
             modifier = Modifier
+                .padding(horizontal = 13.dp)
+                .padding(paddingValues)
         ) {
-            SearchBar(
-                modifier = Modifier.padding(0.dp),
-                inputField = {
+            val inputField =
+                @Composable {
                     SearchBarDefaults.InputField(
                         query = query,
-                        onQueryChange = { onQueryChange(it) },
+                        onQueryChange = { query = it },
                         onSearch = { onSearch(query) },
+                        placeholder = { Text("For example: Paris") },
                         expanded = false,
                         onExpandedChange = {},
                         modifier = Modifier
                             .sizeIn(
                                 minHeight = 25.dp
-                            )
-                    )
-                },
-                expanded = false,
-                onExpandedChange = {},
-                content = {}
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        if (result.isEmpty()) {
-            Text(
-                text = stringResource(R.string.result_list_is_empty),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(15.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(result) { location ->
-                LocationComponentWithActionButton(
-                    locationName = location.name,
-                    locationAddress = "${location.state}, ${location.country}"
-                ) {
-                    Text(
-                        text = "+",
-                        color = Color(0xFF383838),
-                        modifier = Modifier
-                            .clickable(onClick = { onLocationClick(location) })
-                            .background(
-                                color = Color(0x9ED1C4E9),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .padding(vertical = 10.dp, horizontal = 15.dp)
+                            ),
+                        leadingIcon = {
+                            IconButton(
+                                onClick = onBack
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_arrow_back_24),
+                                    contentDescription = ""
+                                )
+                            }
+                        },
+                        trailingIcon = {
+                            if (query.isNotEmpty()) {
+                                IconButton(
+                                    onClick = { query = "" }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_clear_24),
+                                        contentDescription = ""
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
+
+            SearchBar(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .fillMaxWidth(),
+                inputField = inputField,
+                expanded = false,
+                onExpandedChange = {},
+                content = {},
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (result != null) {
+                if (result.isNotEmpty()) {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(result) { location ->
+                            LocationComponent(
+                                onClick = { onLocationClick(location) },
+                                name = location.name,
+                                state = location.state,
+                                country = location.country,
+                            )
+                        }
+                    }
+                } else {
+                    ResultListIsEmpty()
+                }
+            } else {
+                ResultListPlaceholder()
             }
         }
     }
 }
 
-@Preview(device = PIXEL_7_PRO)
 @Composable
-fun SearchScreenPreview() {
-    PreviewScreenContainer {
-        SearchScreen(
-            result = listOf(
-                Location(
-                    id = 1,
-                    longitude = 12.0,
-                    latitude = 14.0,
-                    name = "Nova Vodolaha",
-                    state = "Kharkiv district",
-                    country = "Ukraine",
-                )
-            ),
-            query = "Hello world",
-            onQueryChange = {},
-            onSearch = {},
-            onLocationClick = {},
-        )
-    }
+fun ResultListPlaceholder() {
+    Text(
+        text = stringResource(R.string.query_is_empty),
+        fontSize = 14.sp,
+        fontStyle = FontStyle.Italic,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
+
+@Composable
+fun ResultListIsEmpty() {
+    Text(
+        text = stringResource(R.string.result_list_is_empty),
+        fontSize = 14.sp,
+        fontStyle = FontStyle.Italic,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+//@Preview(device = PIXEL_7_PRO)
+//@Composable
+//fun SearchScreenPreview() {
+//    PreviewScreenContainer {
+//        SearchScreen(
+//            result = listOf(
+//                Location(
+//                    id = 1,
+//                    longitude = 12.0,
+//                    latitude = 14.0,
+//                    name = "Nova Vodolaha",
+//                    state = "Kharkiv district",
+//                    country = "Ukraine",
+//                ),
+//                Location(
+//                    id = 1,
+//                    longitude = 12.0,
+//                    latitude = 14.0,
+//                    name = "Nova Vodolaha",
+//                    state = "Kharkiv district",
+//                    country = "Ukraine",
+//                ),
+//                Location(
+//                    id = 1,
+//                    longitude = 12.0,
+//                    latitude = 14.0,
+//                    name = "Nova Vodolaha",
+//                    state = "Kharkiv district",
+//                    country = "Ukraine",
+//                )
+//            ),
+//            onSearch = {},
+//            onLocationClick = {},
+//            onBack = {}
+//        )
+//    }
+//}

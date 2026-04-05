@@ -1,5 +1,7 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSource
 import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSourceImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.GeoLocationApi
@@ -10,23 +12,24 @@ import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsReposit
 import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepositoryImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetCurrentLocationUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetCurrentLocationUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationDetailsUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationDetailsUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.RemoveLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.RemoveLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.LocationDetailsViewModel
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.LocationsViewModel
 import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.SearchViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val locationModule = module {
+
+    /* =============== Providers ================ */
+
+    single<FusedLocationProviderClient> {
+        LocationServices.getFusedLocationProviderClient(androidContext())
+    }
 
     // ---------- Api ----------
 
@@ -37,13 +40,13 @@ val locationModule = module {
     }
 
     // ---------- Data source ----------
-    
-    single<LocationRemoteDataSource>{
+
+    single<LocationRemoteDataSource> {
         LocationRemoteDataSourceImpl(
             api = get()
         )
     }
-    
+
     single<LocationLocalDataSource> {
         LocationLocalDataSourceImpl(
             locationDao = get()
@@ -55,19 +58,12 @@ val locationModule = module {
     single<LocationsRepository> {
         LocationsRepositoryImpl(
             localDataSource = get(),
-            remoteDataSource = get()
+            remoteDataSource = get(),
+            fusedLocationClient = get(),
         )
     }
 
     // --------- Use case -------------
-
-    single<GetCurrentLocationUseCase> {
-        GetCurrentLocationUseCaseImpl()
-    }
-
-    single<GetLocationDetailsUseCase> {
-        GetLocationDetailsUseCaseImpl()
-    }
 
     single<GetLocationsUseCase> {
         GetLocationsUseCaseImpl(
@@ -94,21 +90,6 @@ val locationModule = module {
     }
 
     // ----------- View model -------------
-
-    viewModel {
-        LocationsViewModel(
-            getLocationsUseCase = get(),
-            addLocationUseCase = get(),
-            removeLocationUseCase = get()
-        )
-    }
-
-    viewModel { params ->
-        LocationDetailsViewModel(
-            locationId = params.get(),
-            getLocationDetailsUseCase = get()
-        )
-    }
 
     viewModel {
         SearchViewModel(

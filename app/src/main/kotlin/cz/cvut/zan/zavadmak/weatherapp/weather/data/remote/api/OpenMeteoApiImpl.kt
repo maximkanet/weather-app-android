@@ -12,6 +12,8 @@ import io.ktor.client.request.get
 
 const val API_URL = "https://api.open-meteo.com/v1/forecast"
 
+// wind_speed_unit=ms&temperature_unit=fahrenheit&precipitation_unit=inch
+
 // API: https://open-meteo.com/
 class OpenMeteoApiImpl(
     private val client: HttpClient
@@ -96,7 +98,6 @@ class OpenMeteoApiImpl(
                         "hourly",
                         weatherFields.joinToString(separator = ",")
                     )
-                    parameters.append("models", "best_match")
                 }
             }
             .body<HourlyWrapper>()

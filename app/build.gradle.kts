@@ -90,6 +90,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
+    // Data store
+    implementation(libs.androidx.datastore.preferences)
+
     // Utils
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)

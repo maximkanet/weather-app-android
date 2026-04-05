@@ -9,6 +9,13 @@ class LocationLocalDataSourceImpl(
     private val locationDao: LocationDao
 ) : LocationLocalDataSource {
 
+    override suspend fun getLocation(
+        longitude: Double,
+        latitude: Double
+    ): Location? {
+        return null
+    }
+
     override suspend fun getLocations(): List<Location> {
         return locationDao.getLocations().map {
             it.toDomainModel()

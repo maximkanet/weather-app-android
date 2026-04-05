@@ -4,177 +4,196 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cz.cvut.zan.zavadmak.weatherapp.R
-import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainer
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.DailyWeatherUiState
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.model.WeatherUiState
 
 @Composable
 fun CurrentWeatherScreen(
-    weather: WeatherUiState?,
-    location: Location?,
-    dailyWeather: DailyWeatherUiState?,
-    onDetailedForecastClick: (Location) -> Unit
+    onHomeClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    location: Location,
+    currentWeather: WeatherUiState,
+    daily: List<DailyWeatherUiState>,
+    hourly: List<WeatherUiState>,
 ) {
+//    Scaffold(
+//        topBar = {
+//            CurrentWeatherTopBar(
+//                onHomeClick = onHomeClick,
+//                onSettingsClick = onSettingsClick
+//            )
+//        }
+//    ) { paddingValues ->
+//        Column(
+//            modifier = Modifier.padding(paddingValues)
+//        ) {
+//            WeatherSummary(
+//                location = location,
+//                currentWeather = currentWeather,
+//            )
+//            DailyForecast(
+//                daily = daily
+//            )
+//            HourlyForecast(
+//                hourly = hourly
+//            )
+//        }
+//    }
+}
 
-    ScreenContainer(
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+@Composable
+fun CurrentWeatherTopBar(
+    onHomeClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        WeatherDetails(
-            location = location?.name ?: stringResource(R.string.unknown_location),
-            currentTemperature = weather?.temperature ?: "",
-            wind = weather?.wind ?: "",
-            windGusts = weather?.windGusts ?: "",
-            windDirection = weather?.windDirection ?: 0.0,
-            humidity = weather?.humidity ?: "",
-            precipitation = weather?.precipitation ?: "",
-            weatherDescription = weather?.weatherCode ?: "",
-            weatherIcon = weather?.weatherIcon ?: R.drawable.clear,
-        )
-
-        SunMovement(
-            sunrise = dailyWeather?.sunrise ?: "-1:00",
-            sunset = dailyWeather?.sunset ?: "-1:00",
-            sunProgress = dailyWeather?.sunProgress ?: 0f,
-        )
-
-        Button(
-            enabled = location != null,
-            onClick = {
-                if (location != null) {
-                    onDetailedForecastClick(location)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.see_detailed_forecast))
+        IconButton(onClick = onHomeClick) {
+            Icon(
+                painter = painterResource(R.drawable.outline_home_24),
+                contentDescription = null
+            )
+        }
+        IconButton(onClick = onSettingsClick) {
+            Icon(
+                painter = painterResource(R.drawable.outline_settings_24),
+                contentDescription = null
+            )
         }
     }
 }
 
 @Composable
-private fun WeatherDetails(
-    location: String,
-    currentTemperature: String,
-    wind: String,
-    windGusts: String,
-    windDirection: Double,
-    humidity: String,
-    precipitation: String,
-    weatherDescription: String,
-    weatherIcon: Int,
+fun WeatherSummary(
+    location: Location,
+    currentWeather: WeatherUiState,
 ) {
-
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                Text(
-                    text = location,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = currentTemperature,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                val infoFontSize = 16.sp
-
-                Text(text = stringResource(R.string.wind) + ": $wind", fontSize = infoFontSize)
-                Text(
-                    text = stringResource(R.string.wind_gusts) + ": $windGusts",
-                    fontSize = infoFontSize
-                )
-                Row {
-                    Text(
-                        text = stringResource(R.string.wind_direction) + ": ",
-                        fontSize = infoFontSize
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.wind_direction_icon),
-                        contentDescription = stringResource(R.string.wind_direction_icon),
-                        modifier = Modifier
-                            .rotate(windDirection.toFloat())
-                            .size(16.dp),
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.humidity) + ": $humidity",
-                    fontSize = infoFontSize
-                )
-                Text(
-                    text = stringResource(R.string.precipitation) + ": $precipitation",
-                    fontSize = infoFontSize
-                )
-            }
-        }
-        Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(weatherIcon),
-                contentDescription = stringResource(R.string.weather_code_icon),
-                modifier = Modifier.size(60.dp)
+        Column {
+            Text(
+                text = location.name
             )
             Text(
-                text = weatherDescription,
-                fontSize = 16.sp,
+                text = currentWeather.temperature
+            )
+        }
+        Column {
+            Icon(
+                painter = painterResource(currentWeather.icon),
+                contentDescription = currentWeather.codeString,
+            )
+            Text(
+                text = currentWeather.codeString
             )
         }
     }
 }
 
 @Composable
-private fun SunMovement(sunrise: String, sunset: String, sunProgress: Float) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+fun DailyForecast(
+    daily: List<DailyWeatherUiState>,
+    onDetailedForecastClick: () -> Unit,
+    forecastButtonEnabled: Boolean,
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(16.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(sunrise)
-            Text(sunset)
+        Column {
+            Text(
+                text = "Forecast"
+            )
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(daily) { weather ->
+                    Text(
+                        text = weather.day,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        painter = painterResource(weather.icon),
+                        contentDescription = weather.codeString,
+                    )
+                    Text(
+                        text = "${weather.temperatureMin} / ${weather.temperatureMax}",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+            Button(
+                enabled = forecastButtonEnabled,
+                onClick = onDetailedForecastClick
+            ) {
+                Text(
+                    text = stringResource(R.string.see_detailed_forecast)
+                )
+            }
         }
-        LinearProgressIndicator(
-            progress = { sunProgress },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(stringResource(R.string.sunrise))
-            Text(stringResource(R.string.sunset))
+    }
+}
+
+@Composable
+fun HourlyForecast(
+    hourly: List<WeatherUiState>
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Column {
+            Text(
+                text = "24h forecast"
+            )
+            LazyRow {
+                items(hourly) { item ->
+                    Column {
+                        Text(
+                            text = item.temperature
+                        )
+                        Icon(
+                            painter = painterResource(item.icon),
+                            contentDescription = item.codeString
+                        )
+                        Text(
+                            text = item.wind
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.wind_direction_icon),
+                            contentDescription = "Wind direction",
+                            modifier = Modifier.rotate(item.windDirection.toFloat())
+                        )
+                        Text(
+                            text = item.time
+                        )
+                    }
+                }
+
+            }
         }
     }
 }

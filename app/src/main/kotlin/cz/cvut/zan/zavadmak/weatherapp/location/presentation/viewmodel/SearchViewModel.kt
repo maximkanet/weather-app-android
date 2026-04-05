@@ -13,21 +13,14 @@ class SearchViewModel(
     private val searchForLocationUseCase: SearchForLocationUseCase
 ) : ViewModel() {
 
-    private val _locations = MutableStateFlow<List<Location>>(listOf())
-    val locations = _locations.asStateFlow()
+    private val _result = MutableStateFlow<List<Location>?>(null)
+    val result = _result.asStateFlow()
 
     private fun applyLocations(locations: List<Location>) {
-        _locations.update { locations }
+        _result.update { locations }
     }
 
-    private val _query = MutableStateFlow<String>("")
-    val query = _query.asStateFlow()
-
-    fun applyQuery(query: String) {
-        _query.update { query }
-    }
-
-    fun searchLocations(query: String) {
+    fun search(query: String) {
         viewModelScope.launch {
             applyLocations(searchForLocationUseCase.execute(query))
         }

@@ -6,4 +6,6 @@ interface GeoLocationApi {
 
     suspend fun search(query: String): List<LocationDto>
 
+    suspend fun reverse(longitude: Double, latitude: Double) : LocationDto?
+
 }

@@ -7,6 +7,13 @@ import cz.cvut.zan.zavadmak.weatherapp.location.mapper.toDomainModel
 class LocationRemoteDataSourceImpl(
     private val api: GeoLocationApi
 ) : LocationRemoteDataSource {
+    override suspend fun findLocation(
+        longitude: Double,
+        latitude: Double
+    ): Location? {
+        return api.reverse(longitude = longitude, latitude = latitude)?.toDomainModel()
+    }
+
     override suspend fun findLocation(query: String): List<Location> {
         return api.search(query).map { it.toDomainModel() }
     }

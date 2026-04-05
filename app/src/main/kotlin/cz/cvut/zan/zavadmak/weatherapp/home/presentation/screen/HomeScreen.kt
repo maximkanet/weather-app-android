@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import cz.cvut.zan.zavadmak.weatherapp.R
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainer
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.LocationRequestUiState
+import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.ScreenMode
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.ActionButtons
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.AppLogo
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component.HomeScreenTopBar
@@ -28,7 +29,11 @@ fun HomeScreen(
     locationRequestState: LocationRequestUiState,
     onSearchButtonClick: () -> Unit,
     onSettingsButtonClick: () -> Unit,
-    onLocationsRemove: (Set<Long>) -> Unit,
+    onLocationsRemove: () -> Unit,
+    onLocationLongClick: (Long) -> Unit,
+    mode: ScreenMode,
+    initiatorId: Long,
+    onLocationChangeCheked: (Long, Boolean) -> Unit,
     onLocationClick: (Location) -> Unit,
     lastLocations: List<Location>,
 ) {
@@ -49,7 +54,11 @@ fun HomeScreen(
             LastLocations(
                 onLocationsRemove = onLocationsRemove,
                 locations = lastLocations,
-                onLocationClick = onLocationClick
+                onLocationClick = onLocationClick,
+                onCheckedChange = onLocationChangeCheked,
+                initiatorId = initiatorId,
+                mode = mode,
+                onLocationLongClick = onLocationLongClick,
             )
         } else {
             Spacer(modifier = Modifier.height(30.dp))

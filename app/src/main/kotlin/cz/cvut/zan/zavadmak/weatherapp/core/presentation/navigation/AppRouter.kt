@@ -31,6 +31,9 @@ fun AppRouter(navController: NavHostController) {
             val lastLocations by viewModel.lastLocations.collectAsStateWithLifecycle()
             val lastLocation by viewModel.lastLocation.collectAsStateWithLifecycle()
 
+            val initiator by viewModel.initiator.collectAsStateWithLifecycle()
+            val mode by viewModel.mode.collectAsStateWithLifecycle()
+
             LaunchedEffect(lastLocation) {
                 lastLocation?.let { navController.navigate(WeatherScreens.CurrentWeather(id = it.id)) }
             }
@@ -44,8 +47,12 @@ fun AppRouter(navController: NavHostController) {
                 lastLocations = lastLocations,
                 onSearchButtonClick = { navController.navigate(MainScreens.Search) },
                 onGetLocationClick = { viewModel.getDeviceLastLocation() },
-                onLocationsRemove = { viewModel.removeSelectedLocations(it) },
-                locationRequestState = locationRequest
+                onLocationsRemove = { viewModel.removeSelectedLocations() },
+                locationRequestState = locationRequest,
+                onLocationLongClick = { viewModel.switchModeToSelection(it) },
+                mode = mode,
+                initiatorId = initiator,
+                onLocationChangeCheked = { id, checked -> viewModel.processSelection(id, checked) },
             )
         }
 

@@ -6,6 +6,7 @@ import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetDeviceLastLocation
 import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.GetLastLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.home.domain.usecase.RemoveSelectedLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.LocationRequestUiState
+import cz.cvut.zan.zavadmak.weatherapp.home.presentation.model.ScreenMode
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.usecase.MarkLocationsAsUsedUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,9 +66,39 @@ class HomeViewModel(
         }
     }
 
-    fun removeSelectedLocations(items: Set<Long>) {
+    private val _mode = MutableStateFlow<ScreenMode>(ScreenMode.IDLE)
+    val mode = _mode.asStateFlow()
+
+    private val _selectedItems = MutableStateFlow<Set<Long>>(setOf())
+    val selectedItems = _selectedItems.asStateFlow()
+
+    private val _initiator = MutableStateFlow<Long>(0)
+    val initiator = _initiator.asStateFlow()
+
+    fun switchModeToSelection(initiatorId: Long) {
+        _selectedItems.update { setOf(initiatorId) }
+        _initiator.update { initiatorId }
+        _mode.update { ScreenMode.SELECTION }
+    }
+
+    fun switchModeToIdle() {
+        _mode.update { ScreenMode.IDLE }
+    }
+
+    fun processSelection(id: Long, checked: Boolean) {
+        if (checked) {
+            _selectedItems.update { selectedItems.value + id }
+        } else {
+            _selectedItems.update { selectedItems.value - id }
+            if (selectedItems.value.isEmpty()) {
+                switchModeToIdle()
+            }
+        }
+    }
+
+    fun removeSelectedLocations() {
         viewModelScope.launch {
-            removeSelectedLocationsUseCase.execute(items.toList())
+            removeSelectedLocationsUseCase.execute(selectedItems.value.toList())
             _lastLocations.update { getLastLocationsUseCase.execute(LAST_LOCATIONS_COUNT) }
         }
     }

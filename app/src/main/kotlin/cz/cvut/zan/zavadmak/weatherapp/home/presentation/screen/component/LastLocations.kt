@@ -1,6 +1,5 @@
 package cz.cvut.zan.zavadmak.weatherapp.home.presentation.screen.component
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
@@ -33,13 +32,14 @@ import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.component.Lo
 
 @Composable
 fun LastLocations(
-    onLocationsRemove: (Set<Long>) -> Unit,
+    onCheckedChange: (Long, Boolean) -> Unit,
+    initiatorId: Long,
+    mode: ScreenMode,
+    onLocationsRemove: () -> Unit,
     onLocationClick: (Location) -> Unit,
+    onLocationLongClick: (Long) -> Unit,
     locations: List<Location>
 ) {
-    var mode by remember { mutableStateOf(ScreenMode.IDLE) }
-    var selectedItems by remember { mutableStateOf(setOf<Long>()) }
-
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -52,16 +52,12 @@ fun LastLocations(
             )
             if (mode == ScreenMode.SELECTION) {
                 IconButton(
-                    onClick = {
-                        onLocationsRemove(selectedItems)
-                        mode = ScreenMode.IDLE
-                        selectedItems = setOf()
-                    }
+                    onClick = onLocationsRemove,
+                    modifier = Modifier.heightIn(max = 28.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_remove_circle_outline_24),
-                        contentDescription = null,
-//                        modifier = Modifier.size(16.dp)
+                        painter = painterResource(R.drawable.outline_delete_forever_24),
+                        contentDescription = "Delete forever button",
                     )
                 }
             }
@@ -73,14 +69,10 @@ fun LastLocations(
         ) {
             items(items = locations) { location ->
                 if (mode == ScreenMode.SELECTION) {
-                    var selected by remember { mutableStateOf(false) }
+                    var selected by remember { mutableStateOf(initiatorId == location.id) }
                     LocationSelectableComponent(
                         onCheckedChange = {
-                            selectedItems = if (it)
-                                selectedItems + location.id
-                            else
-                                selectedItems - location.id
-
+                            onCheckedChange(location.id, it)
                             selected = it
                         },
                         selected = selected,
@@ -90,13 +82,8 @@ fun LastLocations(
                     )
                 } else if (mode == ScreenMode.IDLE) {
                     LocationComponent(
-                        onClick = {
-                            onLocationClick(location)
-                        },
-                        onLongClick = {
-                            mode = ScreenMode.SELECTION
-                            Log.d("LastLocations", "Mode switched to SELECTION")
-                        },
+                        onClick = { onLocationClick(location) },
+                        onLongClick = { onLocationLongClick(location.id) },
                         name = location.name,
                         state = location.state,
                         country = location.country

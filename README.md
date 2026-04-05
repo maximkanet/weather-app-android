@@ -13,6 +13,7 @@ On the settings screen, you can customize the weather units.
 
 ### Screen structure
 
+```
 |- Home
 |- Search
 |- Settings
@@ -23,6 +24,7 @@ Weather graph:
 
 |- Current weather
 |- Forecast
+```
 
 ### External libraries
 

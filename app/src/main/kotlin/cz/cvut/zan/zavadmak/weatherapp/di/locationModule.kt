@@ -1,13 +1,17 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetCurrentLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetCurrentLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationDetailsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationDetailsUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetLocationsUseCaseImpl
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchLocationUseCase
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchLocationUseCaseImpl
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.RemoveLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.RemoveLocationUseCaseImpl
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.LocationDetailsViewModel
 import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.LocationsViewModel
 import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.SearchViewModel
@@ -30,15 +34,25 @@ val locationModule = module {
         GetLocationsUseCaseImpl()
     }
 
-    single<SearchLocationUseCase> {
-        SearchLocationUseCaseImpl()
+    single<SearchForLocationUseCase> {
+        SearchForLocationUseCaseImpl()
+    }
+
+    single<AddLocationUseCase> {
+        AddLocationUseCaseImpl()
+    }
+
+    single<RemoveLocationUseCase> {
+        RemoveLocationUseCaseImpl()
     }
 
     // ----------- View model -------------
 
     viewModel {
         LocationsViewModel(
-            getLocationsUseCase = get()
+            getLocationsUseCase = get(),
+            addLocationUseCase = get(),
+            removeLocationUseCase = get()
         )
     }
 
@@ -51,7 +65,7 @@ val locationModule = module {
 
     viewModel {
         SearchViewModel(
-            searchLocationUseCase = get()
+            searchForLocationUseCase = get()
         )
     }
 

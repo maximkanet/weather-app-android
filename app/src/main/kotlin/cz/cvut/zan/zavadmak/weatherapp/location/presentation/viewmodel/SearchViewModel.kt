@@ -3,14 +3,14 @@ package cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchLocationUseCase
+import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.SearchForLocationUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val searchLocationUseCase: SearchLocationUseCase
+    private val searchForLocationUseCase: SearchForLocationUseCase
 ) : ViewModel() {
 
     private val _locations = MutableStateFlow<List<Location>>(listOf())
@@ -23,15 +23,13 @@ class SearchViewModel(
     private val _query = MutableStateFlow<String>("")
     val query = _query.asStateFlow()
 
-    private fun applyQuery(query: String) {
+    fun applyQuery(query: String) {
         _query.update { query }
     }
 
     fun searchLocations(query: String) {
-        applyQuery(query)
-
         viewModelScope.launch {
-            applyLocations(searchLocationUseCase.execute(query))
+            applyLocations(searchForLocationUseCase.execute(query))
         }
     }
 

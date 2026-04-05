@@ -4,6 +4,7 @@
     <!-- Locations -->
     <string name="locations">Locations</string>
     <string name="unknown_location">Unknown location</string>
+    <string name="result_list_is_empty">Result list is empty</string>
 
     <!-- Weather -->
     <string name="weather_code_icon">Weather code icon</string>

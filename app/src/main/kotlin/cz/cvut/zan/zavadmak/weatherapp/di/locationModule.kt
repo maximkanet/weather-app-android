@@ -1,5 +1,9 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApi
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApiImpl
+import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepository
+import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepositoryImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCase
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCaseImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.GetCurrentLocationUseCase
@@ -20,6 +24,20 @@ import org.koin.dsl.module
 
 val locationModule = module {
 
+    // ---------- Api ----------
+
+    single<NominatimApi> {
+        NominatimApiImpl()
+    }
+
+    // -------- Repository ----------
+
+    single<LocationsRepository> {
+        LocationsRepositoryImpl(
+            nominatim = get()
+        )
+    }
+
     // --------- Use case -------------
 
     single<GetCurrentLocationUseCase> {
@@ -35,7 +53,9 @@ val locationModule = module {
     }
 
     single<SearchForLocationUseCase> {
-        SearchForLocationUseCaseImpl()
+        SearchForLocationUseCaseImpl(
+            repository = get()
+        )
     }
 
     single<AddLocationUseCase> {

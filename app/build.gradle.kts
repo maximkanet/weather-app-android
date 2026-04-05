@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio.jvm)
     implementation(libs.ktor.client.content.negotiation.jvm)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     // Location
     implementation(libs.play.services.location)

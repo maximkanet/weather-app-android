@@ -5,5 +5,8 @@ data class Location(
     val longitude: Double,
     val latitude: Double,
     val shortName: String,
-    val fullName: String
+    @Deprecated("")
+    val fullName: String,
+    val state: String,
+    val country: String
 )

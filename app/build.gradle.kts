@@ -82,6 +82,9 @@ dependencies {
     // Maps
     implementation(libs.maps.compose)
 
+    // Font
+    implementation(libs.androidx.ui.text.google.fonts)
+
     // Accompanist
     implementation(libs.accompanist.permissions)
 

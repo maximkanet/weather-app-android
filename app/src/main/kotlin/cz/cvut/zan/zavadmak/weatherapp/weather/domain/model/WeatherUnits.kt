@@ -1,9 +1,10 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.domain.model
 
 data class WeatherUnits(
-    private val temperature: String,
-    private val speed: String,
-    private val precipitation: String
+    val temperature: String,
+    val speed: String,
+    val precipitation: String,
+    val degree: String,
 ) {
     fun temperature(value: Double) : String {
         val _value = value.toInt()
@@ -28,7 +29,8 @@ data class WeatherUnits(
             return WeatherUnits(
                 temperature = "℃",
                 speed = "m/s",
-                precipitation = "mm"
+                precipitation = "mm",
+                degree = "°"
             )
         }
 

@@ -11,7 +11,10 @@ import androidx.navigation.toRoute
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.navigation.MainScreens
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.navigation.sharedKoinViewModel
 import cz.cvut.zan.zavadmak.weatherapp.location.presentation.viewmodel.LocationsViewModel
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherUnits
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.CurrentWeatherScreen
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen.ForecastScreen
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.CurrentWeatherViewModel
 import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.viewmodel.ForecastViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -85,8 +88,10 @@ fun NavGraphBuilder.weatherNavGraph(
 
             val forecast by viewModel.forecast.collectAsStateWithLifecycle()
 
-            // ...
-
+            ForecastScreen(
+                weatherUnits = WeatherUnits.asDefault(),
+                forecast = forecast
+            )
         }
     }
 }

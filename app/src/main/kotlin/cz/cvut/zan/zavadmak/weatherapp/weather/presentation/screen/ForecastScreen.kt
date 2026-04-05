@@ -1,150 +1,170 @@
 package cz.cvut.zan.zavadmak.weatherapp.weather.presentation.screen
 
-//import cz.cvut.zan.zavadmak.weatherapp.domain.model.WeatherFields
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_7_PRO
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cz.cvut.zan.zavadmak.weatherapp.R
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.Table
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.TableCell
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.TableRow
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.TableRows
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.PreviewScreenContainer
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainerWithTitle
-import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.Purple80
+import cz.cvut.zan.zavadmak.weatherapp.core.presentation.utils.itemGroups
 import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.Weather
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import cz.cvut.zan.zavadmak.weatherapp.weather.domain.model.WeatherUnits
+import cz.cvut.zan.zavadmak.weatherapp.weather.presentation.utils.formatTime
+import kotlinx.datetime.LocalDateTime
 
 @Composable
 fun ForecastScreen(
-    forecast: List<Pair<LocalDateTime, List<Weather>>>,
+    weatherUnits: WeatherUnits,
+    forecast: Map<String, List<Weather>>,
 ) {
     ScreenContainerWithTitle(
         title = "Forecast"
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(30.dp)) {
-            items(forecast) { item ->
+            itemGroups(forecast) { date, forecastItems ->
                 Column {
-                    Text(text = item.first.format(DateTimeFormatter.ofPattern("E (MM.dd)")))
+                    Text(text = date)
                     Spacer(modifier = Modifier.height(10.dp))
-                    ForecastTable(
-                        forecast = item.second
-                    )
+                    Table(
+                        columns = {
+                            val colNameTextSize by remember { mutableStateOf(10.sp) }
+
+                            TableCell(weight = .7f) {
+                                Text(
+                                    text = "time",
+                                    fontSize = colNameTextSize
+                                )
+                            }
+                            TableCell {
+                                Text(
+                                    text = "",
+                                    fontSize = colNameTextSize
+                                )
+                            }
+                            TableCell {
+                                Text(
+                                    text = "t (${weatherUnits.temperature})",
+                                    fontSize = colNameTextSize
+                                )
+                            }
+                            TableCell {
+                                Text(
+                                    text = "w (${weatherUnits.speed})",
+                                    fontSize = colNameTextSize
+                                )
+                            }
+                            TableCell {
+                                Text(
+                                    text = "w_g (${weatherUnits.speed})",
+                                    fontSize = colNameTextSize
+                                )
+                            }
+                            TableCell {
+                                Text(
+                                    text = "w_d (${weatherUnits.degree})",
+                                    fontSize = colNameTextSize
+                                )
+                            }
+                        },
+                    ) {
+                        TableRows(forecastItems) { row ->
+                            TableRow {
+                                TableCell(weight = .7f) {
+                                    Text(row.time.formatTime())
+                                }
+                                TableCell(
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.clear),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                    )
+                                }
+                                TableCell {
+                                    Text(text = row.temperature.toInt().toString())
+                                }
+                                TableCell {
+                                    Text(text = row.wind.toInt().toString())
+                                }
+                                TableCell {
+                                    Text(text = row.windGusts.toInt().toString())
+                                }
+                                TableCell {
+                                    Icon(
+                                        painter = painterResource(R.drawable.wind_direction_icon),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .rotate(row.windDirection.toFloat())
+                                            .size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+@Preview(device = PIXEL_7_PRO)
 @Composable
-fun ForecastTable(
-    forecast: List<Weather>
-) {
-    val columns = remember {
-        listOf(
-            "time",
-            "",
-            "t (℃)",
-            "p (mm)",
-            "w (m/s)",
-            "w_d"
+fun ForecastScreenPreview() {
+    PreviewScreenContainer {
+        ForecastScreen(
+            weatherUnits = WeatherUnits.asDefault(),
+            forecast = mapOf(
+                Pair(
+                    "Thu (xx:xx)",
+                    listOf(
+                        Weather(
+                            time = LocalDateTime.parse("2025-04-25T16:00"),
+                            weatherCode = 6505,
+                            temperature = 42.43,
+                            wind = 44.45,
+                            windGusts = 46.47,
+                            windDirection = 48.49,
+                            humidity = 50.51,
+                            precipitation = 52.53,
+                            precipitationProbability = 54.55
+                        ),
+                        Weather(
+                            time = LocalDateTime.parse("2025-04-25T17:00"),
+                            weatherCode = 6505,
+                            temperature = 42.43,
+                            wind = 44.45,
+                            windGusts = 46.47,
+                            windDirection = 48.49,
+                            humidity = 50.51,
+                            precipitation = 52.53,
+                            precipitationProbability = 54.55
+                        )
+                    )
+                )
+            )
         )
     }
-
-    val columnWeight = remember { 1f }
-
-    Column {
-        // Columns name
-        Row {
-            columns.forEach { name ->
-                Text(
-                    text = name,
-                    fontSize = 10.sp,
-                    modifier = Modifier
-                        .weight(columnWeight)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(5.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            forecast.forEach { weatherFields ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-//                    Text(
-//                        text = weatherFields.time.format(DateTimeFormatter.ofPattern("hh:mm")),
-//                        modifier = Modifier.weight(columnWeight)
-//                    )
-                    Box(modifier = Modifier.weight(columnWeight)) {
-                        Icon(
-                            painter = painterResource(R.drawable.clear),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(16.dp),
-                            tint = Purple80
-                        )
-                    }
-                    Text(
-                        text = weatherFields.temperature.toString(),
-                        modifier = Modifier.weight(columnWeight)
-                    )
-                    Text(
-                        text = weatherFields.precipitation.toString(),
-                        modifier = Modifier.weight(columnWeight)
-                    )
-                    Text(
-                        text = weatherFields.wind.toString(),
-                        modifier = Modifier.weight(columnWeight)
-                    )
-                    Box(modifier = Modifier.weight(columnWeight)) {
-                        Icon(
-                            painter = painterResource(R.drawable.wind_direction_icon),
-                            contentDescription = "Wind direction icon",
-                            modifier = Modifier
-                                .rotate(weatherFields.windDirection.toFloat())
-                                .size(16.dp),
-                            tint = Color(0xFF135CD2)
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
-
-
-//@Preview(device = PIXEL_7_PRO)
-//@Composable
-//fun ForecastScreenPreview() {
-//    PreviewScreenContainer {
-//        ForecastScreen(
-//            forecast = listOf(
-//                Pair(
-//                    LocalDateTime.of(2025, 4, 25, 5, 0),
-//                    WeatherFields.createDummyForecast()
-//                ),
-//                Pair(
-//                    LocalDateTime.of(2025, 4, 26, 5, 0),
-//                    WeatherFields.createDummyForecast()
-//                ),
-//                Pair(
-//                    LocalDateTime.of(2025, 4, 27, 5, 0),
-//                    WeatherFields.createDummyForecast()
-//                )
-//            ),
-//        )
-//    }
-//}

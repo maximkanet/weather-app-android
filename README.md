@@ -1,28 +1,36 @@
 # Weather app
 
-V této aplikaci si můžeme zobrazit aktuální počasí, předpověď počasí, změnit jednotky, přidávat a
-odstraňovat lokace.
+An application for viewing the weather in specific locations. You can find a location by name or get
+the current location of the phone. You can set reminders to view the weather or turn them off.
+On the home screen you can see the last locations that have been viewed, and by long pressing on
+location, you can switch to the mode of selecting and deleting locations.
 
+On the settings screen, you can customize the weather units.
 
-## Status:
+### Requirements
+- Min SDK: 33
+- JVM target: 17
 
-Currently working on:
-- Forecast screen
-- Screens in location module
+### Screen structure
 
-TODO:
-- Api requesting
+|- Home
+|- Search
+|- Settings
 
-## Vyuzite technologie:
+(Home or Search) -> Weather Graph
 
-- Koin - pro dependency injection
-- Ktor - pro dotazovani k API (open-meteo)
+Weather graph:
 
-## Co umoznuje?
+|- Current weather
+|- Forecast
 
-- Current weather
-- Weather forecast
-- Search location
-- Add location
-- Remove location
-- Edit weather units (temperature, speed, ...)
+### External libraries
+
+- Koin
+- Ktor
+- Play services (Location)
+- Google fonts
+- Kotlin Datetime
+- Accompanist
+- Data store
+- Room

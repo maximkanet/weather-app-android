@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
@@ -31,8 +32,13 @@ fun LocationsScreen(
         title = "Locations",
         actionButton = {
             ButtonWithIcon(
-                text = "+",
-                onClick = onAddClick
+                text = "",
+                icon = R.drawable.loupe_icon,
+                onClick = onAddClick,
+                modifier = Modifier.sizeIn(
+                    maxWidth = 32.dp,
+                    maxHeight = 32.dp
+                )
             )
         }
     ) {

@@ -14,16 +14,16 @@ sealed class BottomNavBarButton(
 
     data object Home : BottomNavBarButton(
         screen = MainScreens.Weather,
-        label = "Home screen",
-        iconId = R.drawable.clear,
-        contentDescription = ""
+        label = "Current weather",
+        iconId = R.drawable.home_icon,
+        contentDescription = "Home icon"
     )
 
-    data object Cities : BottomNavBarButton(
+    data object Locations : BottomNavBarButton(
         screen = MainScreens.Locations,
-        label = "Home screen",
-        iconId = R.drawable.clear,
-        contentDescription = ""
+        label = "Locations",
+        iconId = R.drawable.location_icon,
+        contentDescription = "Location icon"
     )
 
 //    data object Settings : BottomNavBarButton(
@@ -38,7 +38,7 @@ sealed class BottomNavBarButton(
         fun asDefaultList(): List<BottomNavBarButton> {
             return listOf(
                 Home,
-                Cities,
+                Locations,
 //                Settings
             )
         }

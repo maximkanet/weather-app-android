@@ -30,6 +30,7 @@ import cz.cvut.zan.zavadmak.weatherapp.R
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.PreviewScreenContainer
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainerWithTitle
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
+import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.component.LocationComponentWithActionButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,23 +86,10 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             items(result) { location ->
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                LocationComponentWithActionButton(
+                    locationName = location.name,
+                    locationAddress = "${location.state}, ${location.country}"
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = location.name,
-                            fontSize = 16.sp
-                        )
-                        Text(
-                            text = "${location.state}, ${location.country}",
-                            color = Color(0xFF4E4E4E),
-                            fontSize = 14.sp
-                        )
-                    }
                     Text(
                         text = "+",
                         color = Color(0xFF383838),
@@ -130,7 +118,6 @@ fun SearchScreenPreview() {
                     longitude = 12.0,
                     latitude = 14.0,
                     name = "Nova Vodolaha",
-                    fullName = "Nova vodolaha jnd jsdjn fjnsdj fnjsdn jfjsd njf jsdn fjsdj nfjnsd jfn jsdnj fnjsdn jfnjsd njf nsjd nfjnsd jnf jdsnfj sndj fn",
                     state = "Kharkiv district",
                     country = "Ukraine",
                 )

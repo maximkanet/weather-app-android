@@ -21,6 +21,7 @@ import cz.cvut.zan.zavadmak.weatherapp.R
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.ButtonWithIcon
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.component.containers.ScreenContainerWithTitle
+import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.component.LocationComponentWithActionButton
 
 @Composable
 fun LocationsScreen(
@@ -47,24 +48,10 @@ fun LocationsScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             items(locations) { location ->
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                LocationComponentWithActionButton(
+                    locationName = location.name,
+                    locationAddress = "${location.state}, ${location.country}"
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Text(
-                            text = location.name,
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = location.fullName,
-                            fontSize = 16.sp,
-                            color = Color(0xFF2B2B2B)
-                        )
-                    }
                     Icon(
                         painter = painterResource(R.drawable.baseline_remove_circle_outline_24),
                         contentDescription = null,

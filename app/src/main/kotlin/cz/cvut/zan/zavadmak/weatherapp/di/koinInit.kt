@@ -7,7 +7,10 @@ fun initKoin(config: KoinAppDeclaration? = null) {
     startKoin {
         config?.invoke(this)
         modules(
-            weatherModule, navigationModule, locationModule
+            weatherModule,
+            navigationModule,
+            locationModule,
+            databaseModule
         )
     }
 }

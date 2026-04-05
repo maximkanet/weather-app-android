@@ -1,7 +1,11 @@
 package cz.cvut.zan.zavadmak.weatherapp.di
 
+import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSource
+import cz.cvut.zan.zavadmak.weatherapp.location.data.local.source.LocationLocalDataSourceImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApi
 import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.api.NominatimApiImpl
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSource
+import cz.cvut.zan.zavadmak.weatherapp.location.data.remote.source.LocationRemoteDataSourceImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepository
 import cz.cvut.zan.zavadmak.weatherapp.location.data.repository.LocationsRepositoryImpl
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.usecase.AddLocationUseCase
@@ -30,11 +34,26 @@ val locationModule = module {
         NominatimApiImpl()
     }
 
+    // ---------- Data source ----------
+    
+    single<LocationRemoteDataSource>{
+        LocationRemoteDataSourceImpl(
+            api = get()
+        )
+    }
+    
+    single<LocationLocalDataSource> {
+        LocationLocalDataSourceImpl(
+            locationDao = get()
+        )
+    }
+
     // -------- Repository ----------
 
     single<LocationsRepository> {
         LocationsRepositoryImpl(
-            nominatim = get()
+            localDataSource = get(),
+            remoteDataSource = get()
         )
     }
 

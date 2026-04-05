@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import cz.cvut.zan.zavadmak.weatherapp.R
 import cz.cvut.zan.zavadmak.weatherapp.core.presentation.theme.Typography
 import cz.cvut.zan.zavadmak.weatherapp.location.domain.model.Location
-import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.content.LocationComponent
+import cz.cvut.zan.zavadmak.weatherapp.location.presentation.screen.component.LocationComponent
 
 @Composable
 fun LastLocations(

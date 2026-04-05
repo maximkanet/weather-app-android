@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.androidx.room)
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0-Beta1"
+    id("com.google.devtools.ksp") version "2.1.20-1.0.32"
 }
 
 android {
@@ -30,11 +31,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -45,6 +46,10 @@ android {
 }
 
 dependencies {
+    // KSP
+    implementation(libs.dagger.compiler)
+    ksp(libs.dagger.compiler)
+
     // Main
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -82,7 +87,7 @@ dependencies {
 
     // Room
     implementation(libs.androidx.room.runtime)
-//    ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
     // Utils

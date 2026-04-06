@@ -7,6 +7,12 @@ location, you can switch to the mode of selecting and deleting locations.
 
 On the settings screen, you can customize the weather units.
 
+### Screenshots
+
+![](screenshots/screens-1.png)
+![](screenshots/screens-2.png)
+
+
 ### Requirements
 - Min SDK: 33
 - JVM target: 17
